@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes hero-glow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@utility bg-hero-glow {
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.546 0.245 262.881 / 0.15), transparent);
+}
+
+@utility bg-hero-glow-light {
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.546 0.245 262.881 / 0.08), transparent);
+}
+
+@utility text-gradient {
+  background: linear-gradient(135deg, var(--fg), var(--accent), var(--fg-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-hover: var(--surface-hover);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-fg: var(--fg);
+  --color-fg-secondary: var(--fg-secondary);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+}
+
+:root {
+  --surface: #09090b;
+  --surface-elevated: #18181b;
+  --surface-hover: #27272a;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --fg: #f4f4f5;
+  --fg-secondary: #a1a1aa;
+  --fg-muted: #71717a;
+  --border: #27272a;
+  color-scheme: dark;
+}
+
+.light {
+  --surface: #fafafa;
+  --surface-elevated: #ffffff;
+  --surface-hover: #f4f4f5;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --fg: #18181b;
+  --fg-secondary: #71717a;
+  --fg-muted: #a1a1aa;
+  --border: #e4e4e7;
+  color-scheme: light;
+}
+
+.light .bg-hero-glow {
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.546 0.245 262.881 / 0.08), transparent);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+::selection {
+  background-color: oklch(0.623 0.214 259.815 / 0.3);
+}
