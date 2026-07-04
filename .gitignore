@@ -33,6 +33,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# AI agent skills (not committed)
+skills/
+.agents/
+
+# WIP levels
+apps/level-2/
+
 # Misc
 .DS_Store
 *.pem
