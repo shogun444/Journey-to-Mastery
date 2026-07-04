@@ -55,17 +55,17 @@ NEXT_PUBLIC_STELLAR_NETWORK=testnet
 
 ## Screenshots
 
-### Wallet Connected with Balance
-![Wallet Connected with Balance](screenshots/transactionHistoryWithBalance.png)
+### 1. Testnet Transaction of 34 XLM
+![Testnet Transaction of 34 XLM](screenshots/transactions(Testnet).png)
 
-### Successful Transaction
+### 2. Transaction on StellarExpert
+![Transaction on StellarExpert](screenshots/transactiononStellarExpert.png)
+
+### 3. Successful Transaction
 ![Successful Transaction](screenshots/transactionConfirmed.png)
 
-### Testnet Transactions
-![Testnet Transactions](screenshots/transactions(Testnet).png)
-
-### Transaction on StellarExpert
-![Transaction on StellarExpert](screenshots/transactiononStellarExpert.png)
+### 4. Transaction of 500 XLM with History
+![Transaction of 500 XLM with History](screenshots/transactionHistoryWithBalanceAfterSucessfullTransactrion.png)
 
 Example transaction:
 [https://stellar.expert/explorer/testnet/tx/4e5ec6bacc5d4975118287c3b8cab47aa6f173fdc8745000454195e0b97d6576](https://stellar.expert/explorer/testnet/tx/4e5ec6bacc5d4975118287c3b8cab47aa6f173fdc8745000454195e0b97d6576)

@@ -32,12 +32,12 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ### Screenshots
 
-| State | Screenshot |
-|---|---|
-| Wallet connected + balance | ![Wallet Connected](apps/level-1/screenshots/transactionHistoryWithBalance.png) |
-| Successful transaction | ![Tx Confirmed](apps/level-1/screenshots/transactionConfirmed.png) |
-| Testnet transactions | ![Transactions](apps/level-1/screenshots/transactions(Testnet).png) |
-| StellarExpert explorer | ![StellarExpert](apps/level-1/screenshots/transactiononStellarExpert.png) |
+| Step | Screenshot |
+|---|---|---|
+| 1. Testnet transaction of 34 XLM | ![Tx 34 XLM](apps/level-1/screenshots/transactions(Testnet).png) |
+| 2. Transaction on StellarExpert | ![StellarExpert](apps/level-1/screenshots/transactiononStellarExpert.png) |
+| 3. Successful transaction | ![Tx Confirmed](apps/level-1/screenshots/transactionConfirmed.png) |
+| 4. Transaction of 500 XLM with history | ![Tx 500 + History](apps/level-1/screenshots/transactionHistoryWithBalanceAfterSucessfullTransactrion.png) |
 
 ### Tech Stack
 
