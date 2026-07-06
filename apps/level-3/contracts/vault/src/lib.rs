@@ -1,14 +1,11 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, contractevent,
-    token::Client as TokenClient,
-    Address, Env,
+    contract, contracterror, contractevent, contractimpl, contracttype,
+    token::Client as TokenClient, Address, Env,
 };
 
 mod st_xlm_token {
-    soroban_sdk::contractimport!(
-        file = "../st-xlm/target/wasm32v1-none/release/st_xlm.wasm"
-    );
+    soroban_sdk::contractimport!(file = "../st-xlm/target/wasm32v1-none/release/st_xlm.wasm");
 }
 
 const MAX_BPS: u32 = 10000;
@@ -107,8 +104,12 @@ impl Vault {
         env.storage().instance().set(&DataKey::StXlmToken, &st_xlm);
         env.storage().instance().set(&DataKey::XlmToken, &xlm_token);
         env.storage().instance().set(&DataKey::Treasury, &treasury);
-        env.storage().instance().set(&DataKey::DepositFeeBps, &deposit_fee_bps);
-        env.storage().instance().set(&DataKey::WithdrawFeeBps, &withdraw_fee_bps);
+        env.storage()
+            .instance()
+            .set(&DataKey::DepositFeeBps, &deposit_fee_bps);
+        env.storage()
+            .instance()
+            .set(&DataKey::WithdrawFeeBps, &withdraw_fee_bps);
         env.storage().instance().set(&DataKey::Paused, &false);
     }
 
@@ -123,7 +124,11 @@ impl Vault {
 
         let total_assets = Self::total_assets(env.clone());
         let total_supply = Self::total_supply(env.clone());
-        let deposit_fee_bps: u32 = env.storage().instance().get(&DataKey::DepositFeeBps).unwrap();
+        let deposit_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::DepositFeeBps)
+            .unwrap();
 
         let fee = if deposit_fee_bps > 0 {
             assets * deposit_fee_bps as i128 / MAX_BPS as i128
@@ -150,7 +155,12 @@ impl Vault {
         }
 
         Self::_emit_exchange_rate(&env);
-        DepositedEvent { sender, assets, shares }.publish(&env);
+        DepositedEvent {
+            sender,
+            assets,
+            shares,
+        }
+        .publish(&env);
         shares
     }
 
@@ -170,7 +180,11 @@ impl Vault {
             panic!("no supply");
         }
 
-        let withdraw_fee_bps: u32 = env.storage().instance().get(&DataKey::WithdrawFeeBps).unwrap();
+        let withdraw_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::WithdrawFeeBps)
+            .unwrap();
         let gross_assets = shares * total_assets / total_supply;
         let fee = if withdraw_fee_bps > 0 {
             gross_assets * withdraw_fee_bps as i128 / MAX_BPS as i128
@@ -192,7 +206,12 @@ impl Vault {
         }
 
         Self::_emit_exchange_rate(&env);
-        WithdrawnEvent { sender, shares, assets: net_assets }.publish(&env);
+        WithdrawnEvent {
+            sender,
+            shares,
+            assets: net_assets,
+        }
+        .publish(&env);
         net_assets
     }
 
@@ -202,7 +221,11 @@ impl Vault {
         }
         let total_assets = Self::total_assets(env.clone());
         let total_supply = Self::total_supply(env.clone());
-        let deposit_fee_bps: u32 = env.storage().instance().get(&DataKey::DepositFeeBps).unwrap();
+        let deposit_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::DepositFeeBps)
+            .unwrap();
         let fee = if deposit_fee_bps > 0 {
             assets * deposit_fee_bps as i128 / MAX_BPS as i128
         } else {
@@ -225,7 +248,11 @@ impl Vault {
         if total_supply == 0 {
             return 0;
         }
-        let withdraw_fee_bps: u32 = env.storage().instance().get(&DataKey::WithdrawFeeBps).unwrap();
+        let withdraw_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::WithdrawFeeBps)
+            .unwrap();
         let gross_assets = shares * total_assets / total_supply;
         let fee = if withdraw_fee_bps > 0 {
             gross_assets * withdraw_fee_bps as i128 / MAX_BPS as i128
@@ -244,7 +271,11 @@ impl Vault {
         if total_supply == 0 || total_assets == 0 {
             return assets;
         }
-        let withdraw_fee_bps: u32 = env.storage().instance().get(&DataKey::WithdrawFeeBps).unwrap();
+        let withdraw_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::WithdrawFeeBps)
+            .unwrap();
         let gross_assets = assets * MAX_BPS as i128 / (MAX_BPS as i128 - withdraw_fee_bps as i128);
         let shares = gross_assets * total_supply / total_assets;
         shares
@@ -259,7 +290,11 @@ impl Vault {
         if total_supply == 0 || total_assets == 0 {
             return shares;
         }
-        let deposit_fee_bps: u32 = env.storage().instance().get(&DataKey::DepositFeeBps).unwrap();
+        let deposit_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::DepositFeeBps)
+            .unwrap();
         let gross_assets = shares * total_assets / total_supply;
         let fee = if deposit_fee_bps > 0 {
             gross_assets * deposit_fee_bps as i128 / (MAX_BPS as i128 - deposit_fee_bps as i128)
@@ -339,7 +374,10 @@ impl Vault {
     }
 
     pub fn paused(env: Env) -> bool {
-        env.storage().instance().get(&DataKey::Paused).unwrap_or(false)
+        env.storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false)
     }
 
     pub fn pause(env: Env) {
@@ -368,15 +406,25 @@ impl Vault {
         }
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
-        env.storage().instance().set(&DataKey::DepositFeeBps, &deposit_fee_bps);
-        env.storage().instance().set(&DataKey::WithdrawFeeBps, &withdraw_fee_bps);
-        FeeUpdatedEvent { deposit_fee_bps, withdraw_fee_bps }.publish(&env);
+        env.storage()
+            .instance()
+            .set(&DataKey::DepositFeeBps, &deposit_fee_bps);
+        env.storage()
+            .instance()
+            .set(&DataKey::WithdrawFeeBps, &withdraw_fee_bps);
+        FeeUpdatedEvent {
+            deposit_fee_bps,
+            withdraw_fee_bps,
+        }
+        .publish(&env);
     }
 
     pub fn set_treasury(env: Env, new_treasury: Address) {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
-        env.storage().instance().set(&DataKey::Treasury, &new_treasury);
+        env.storage()
+            .instance()
+            .set(&DataKey::Treasury, &new_treasury);
         TreasuryUpdatedEvent { new_treasury }.publish(&env);
     }
 
@@ -389,11 +437,17 @@ impl Vault {
     }
 
     pub fn deposit_fee_bps(env: Env) -> u32 {
-        env.storage().instance().get(&DataKey::DepositFeeBps).unwrap_or(0)
+        env.storage()
+            .instance()
+            .get(&DataKey::DepositFeeBps)
+            .unwrap_or(0)
     }
 
     pub fn withdraw_fee_bps(env: Env) -> u32 {
-        env.storage().instance().get(&DataKey::WithdrawFeeBps).unwrap_or(0)
+        env.storage()
+            .instance()
+            .get(&DataKey::WithdrawFeeBps)
+            .unwrap_or(0)
     }
 
     fn _transfer_xlm_in(env: &Env, from: &Address, amount: i128) {
@@ -431,7 +485,8 @@ impl Vault {
                 old_rate_d1: 0,
                 new_rate_d0: total_assets,
                 new_rate_d1: total_supply,
-            }.publish(env);
+            }
+            .publish(env);
         }
     }
 }

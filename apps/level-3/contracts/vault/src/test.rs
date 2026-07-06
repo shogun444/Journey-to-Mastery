@@ -1,8 +1,7 @@
 #![cfg(test)]
 use super::*;
 use soroban_sdk::{
-    testutils::Address as _, token::StellarAssetClient as TokenAdminClient,
-    Address, Env, String,
+    testutils::Address as _, token::StellarAssetClient as TokenAdminClient, Address, Env, String,
 };
 
 fn setup_env() -> (Env, Address, Address, Address) {
@@ -16,7 +15,12 @@ fn setup_env() -> (Env, Address, Address, Address) {
     // Deploy stXLM token
     let st_xlm = env.register(
         st_xlm_token::WASM,
-        (admin.clone(), String::from_str(&env, "Staked XLM"), String::from_str(&env, "stXLM"), 7u32),
+        (
+            admin.clone(),
+            String::from_str(&env, "Staked XLM"),
+            String::from_str(&env, "stXLM"),
+            7u32,
+        ),
     );
     let st_xlm_client = st_xlm_token::Client::new(&env, &st_xlm);
 
@@ -28,7 +32,14 @@ fn setup_env() -> (Env, Address, Address, Address) {
     // Deploy vault
     let vault = env.register(
         Vault,
-        (admin.clone(), st_xlm.clone(), xlm_token.clone(), treasury.clone(), 0u32, 0u32),
+        (
+            admin.clone(),
+            st_xlm.clone(),
+            xlm_token.clone(),
+            treasury.clone(),
+            0u32,
+            0u32,
+        ),
     );
 
     // Set vault as minter on stXLM

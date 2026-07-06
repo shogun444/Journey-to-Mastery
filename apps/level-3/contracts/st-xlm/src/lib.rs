@@ -1,7 +1,6 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, contractevent,
-    Address, Env, String,
+    contract, contracterror, contractevent, contractimpl, contracttype, Address, Env, String,
 };
 
 #[contracterror]
@@ -87,7 +86,8 @@ impl StXlmToken {
     }
 
     pub fn balance(env: Env, id: Address) -> i128 {
-        env.storage().persistent()
+        env.storage()
+            .persistent()
             .get(&DataKey::Balance(id))
             .unwrap_or(0)
     }
@@ -97,7 +97,8 @@ impl StXlmToken {
     }
 
     pub fn allowance(env: Env, owner: Address, spender: Address) -> i128 {
-        env.storage().persistent()
+        env.storage()
+            .persistent()
             .get(&DataKey::Allowance(owner.clone(), spender.clone()))
             .map(|v: AllowanceValue| {
                 if v.expiration_ledger < env.ledger().sequence() {
@@ -119,7 +120,10 @@ impl StXlmToken {
         let expiration = env.ledger().sequence() + 200000;
         env.storage().persistent().set(
             &DataKey::Allowance(owner.clone(), spender.clone()),
-            &AllowanceValue { amount: new_allowance, expiration_ledger: expiration },
+            &AllowanceValue {
+                amount: new_allowance,
+                expiration_ledger: expiration,
+            },
         );
         env.storage().persistent().extend_ttl(
             &DataKey::Allowance(owner.clone(), spender.clone()),
@@ -138,7 +142,10 @@ impl StXlmToken {
         let expiration = env.ledger().sequence() + 200000;
         env.storage().persistent().set(
             &DataKey::Allowance(owner.clone(), spender.clone()),
-            &AllowanceValue { amount: new_allowance, expiration_ledger: expiration },
+            &AllowanceValue {
+                amount: new_allowance,
+                expiration_ledger: expiration,
+            },
         );
         env.storage().persistent().extend_ttl(
             &DataKey::Allowance(owner.clone(), spender.clone()),
@@ -147,21 +154,35 @@ impl StXlmToken {
         );
     }
 
-    pub fn approve(env: Env, owner: Address, spender: Address, amount: i128, expiration_ledger: u32) {
+    pub fn approve(
+        env: Env,
+        owner: Address,
+        spender: Address,
+        amount: i128,
+        expiration_ledger: u32,
+    ) {
         owner.require_auth();
         if amount < 0 {
             panic!("amount must be non-negative");
         }
         env.storage().persistent().set(
             &DataKey::Allowance(owner.clone(), spender.clone()),
-            &AllowanceValue { amount, expiration_ledger },
+            &AllowanceValue {
+                amount,
+                expiration_ledger,
+            },
         );
         env.storage().persistent().extend_ttl(
             &DataKey::Allowance(owner.clone(), spender.clone()),
             17280,
             518400,
         );
-        ApprovalEvent { owner, spender, amount }.publish(&env);
+        ApprovalEvent {
+            owner,
+            spender,
+            amount,
+        }
+        .publish(&env);
     }
 
     pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
@@ -174,14 +195,12 @@ impl StXlmToken {
             panic!("insufficient balance");
         }
         let to_balance = Self::balance(env.clone(), to.clone());
-        env.storage().persistent().set(
-            &DataKey::Balance(from.clone()),
-            &(from_balance - amount),
-        );
-        env.storage().persistent().set(
-            &DataKey::Balance(to.clone()),
-            &(to_balance + amount),
-        );
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(to.clone()), &(to_balance + amount));
         Self::extend_balances(&env, &from, &to);
         TransferEvent { from, to, amount }.publish(&env);
     }
@@ -204,16 +223,17 @@ impl StXlmToken {
         let expiration = env.ledger().sequence() + 200000;
         env.storage().persistent().set(
             &DataKey::Allowance(from.clone(), spender.clone()),
-            &AllowanceValue { amount: new_allowance, expiration_ledger: expiration },
+            &AllowanceValue {
+                amount: new_allowance,
+                expiration_ledger: expiration,
+            },
         );
-        env.storage().persistent().set(
-            &DataKey::Balance(from.clone()),
-            &(from_balance - amount),
-        );
-        env.storage().persistent().set(
-            &DataKey::Balance(to.clone()),
-            &(to_balance + amount),
-        );
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(to.clone()), &(to_balance + amount));
         Self::extend_balances(&env, &from, &to);
         TransferEvent { from, to, amount }.publish(&env);
     }
@@ -228,10 +248,23 @@ impl StXlmToken {
         let new_supply = supply.checked_add(amount).expect("supply overflow");
         let balance = Self::balance(env.clone(), to.clone());
         env.storage().instance().set(&DataKey::Supply, &new_supply);
-        env.storage().persistent().set(&DataKey::Balance(to.clone()), &(balance + amount));
-        env.storage().persistent().extend_ttl(&DataKey::Balance(to.clone()), 17280, 518400);
-        MintEvent { to: to.clone(), amount }.publish(&env);
-        TransferEvent { from: env.current_contract_address(), to, amount }.publish(&env);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(to.clone()), &(balance + amount));
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Balance(to.clone()), 17280, 518400);
+        MintEvent {
+            to: to.clone(),
+            amount,
+        }
+        .publish(&env);
+        TransferEvent {
+            from: env.current_contract_address(),
+            to,
+            amount,
+        }
+        .publish(&env);
     }
 
     pub fn burn(env: Env, from: Address, amount: i128) {
@@ -245,10 +278,23 @@ impl StXlmToken {
             panic!("insufficient balance");
         }
         let supply: i128 = env.storage().instance().get(&DataKey::Supply).unwrap();
-        env.storage().instance().set(&DataKey::Supply, &(supply - amount));
-        env.storage().persistent().set(&DataKey::Balance(from.clone()), &(balance - amount));
-        BurnEvent { from: from.clone(), amount }.publish(&env);
-        TransferEvent { from, to: env.current_contract_address(), amount }.publish(&env);
+        env.storage()
+            .instance()
+            .set(&DataKey::Supply, &(supply - amount));
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(balance - amount));
+        BurnEvent {
+            from: from.clone(),
+            amount,
+        }
+        .publish(&env);
+        TransferEvent {
+            from,
+            to: env.current_contract_address(),
+            amount,
+        }
+        .publish(&env);
     }
 
     pub fn burn_from(env: Env, spender: Address, from: Address, amount: i128) {
@@ -271,12 +317,28 @@ impl StXlmToken {
         let expiration = env.ledger().sequence() + 200000;
         env.storage().persistent().set(
             &DataKey::Allowance(from.clone(), spender.clone()),
-            &AllowanceValue { amount: new_allowance, expiration_ledger: expiration },
+            &AllowanceValue {
+                amount: new_allowance,
+                expiration_ledger: expiration,
+            },
         );
-        env.storage().instance().set(&DataKey::Supply, &(supply - amount));
-        env.storage().persistent().set(&DataKey::Balance(from.clone()), &(balance - amount));
-        BurnEvent { from: from.clone(), amount }.publish(&env);
-        TransferEvent { from, to: env.current_contract_address(), amount }.publish(&env);
+        env.storage()
+            .instance()
+            .set(&DataKey::Supply, &(supply - amount));
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(balance - amount));
+        BurnEvent {
+            from: from.clone(),
+            amount,
+        }
+        .publish(&env);
+        TransferEvent {
+            from,
+            to: env.current_contract_address(),
+            amount,
+        }
+        .publish(&env);
     }
 
     pub fn set_minter(env: Env, new_minter: Address) {
@@ -286,8 +348,12 @@ impl StXlmToken {
     }
 
     fn extend_balances(env: &Env, from: &Address, to: &Address) {
-        env.storage().persistent().extend_ttl(&DataKey::Balance(from.clone()), 17280, 518400);
-        env.storage().persistent().extend_ttl(&DataKey::Balance(to.clone()), 17280, 518400);
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Balance(from.clone()), 17280, 518400);
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Balance(to.clone()), 17280, 518400);
     }
 }
 
