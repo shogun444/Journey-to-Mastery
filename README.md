@@ -74,7 +74,13 @@ Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **@stellar/stell
 
 ### Screenshots
 
-> Screenshots coming soon.
+| Step | Screenshot |
+|---|---|---|
+| 1. Home page (wallet connected) | ![Home](apps/level-2/screenshots/home.png) |
+| 2. Freighter transaction approval | ![Freighter Tx](apps/level-2/screenshots/freighterTransaction.png) |
+| 3. Successful transaction | ![Tx Success](apps/level-2/screenshots/transactionSuccesfull.png) |
+| 4. Transaction on StellarExpert | ![StellarExpert](apps/level-2/screenshots/stellarExpertTrasactionInformation.png) |
+| 5. USDC balance after conversion | ![USDC After](apps/level-2/screenshots/usdcAfterConversion.png) |
 
 ### Setup
 

@@ -17,7 +17,23 @@ Built with **Next.js 16**, **TypeScript strict**, **Tailwind CSS v4**, **@stella
 
 ## Screenshots
 
-> Screenshots coming soon.
+### 1. Home Page (Wallet Connected)
+![Home Page](screenshots/home.png)
+
+### 2. Freighter Transaction Approval
+![Freighter Transaction](screenshots/freighterTransaction.png)
+
+### 3. Successful Transaction
+![Transaction Successful](screenshots/transactionSuccesfull.png)
+
+### 4. Transaction on StellarExpert
+![StellarExpert Transaction](screenshots/stellarExpertTrasactionInformation.png)
+
+### 5. USDC Balance After Conversion
+![USDC After Conversion](screenshots/usdcAfterConversion.png)
+
+Example transaction:
+[https://stellar.expert/explorer/testnet/tx/5501bfa197fa0a644b34cc0c9f55885153faed1be24030dd55963914b3197eed](https://stellar.expert/explorer/testnet/tx/5501bfa197fa0a644b34cc0c9f55885153faed1be24030dd55963914b3197eed)
 
 ## Getting Started
 

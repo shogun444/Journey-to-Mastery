@@ -28,3 +28,13 @@ export const STELLAR_TOKENS: Token[] = [
 export function getTokenByCode(code: string): Token | undefined {
   return STELLAR_TOKENS.find((t) => t.code === code)
 }
+
+export const FALLBACK_RATES: Record<string, Record<string, number>> = {
+  XLM: { USDC: 2.25, AQUA: 12.0 },
+  USDC: { XLM: 0.44, AQUA: 5.3 },
+  AQUA: { XLM: 0.083, USDC: 0.19 },
+}
+
+export function getFallbackRate(sourceCode: string, destCode: string): number | null {
+  return FALLBACK_RATES[sourceCode]?.[destCode] ?? null
+}

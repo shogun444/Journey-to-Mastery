@@ -36,6 +36,17 @@ export interface TxState {
   message?: string
 }
 
+export interface Transaction {
+  id: string
+  hash: string
+  type: "send" | "receive" | "swap"
+  amount: string
+  asset: string
+  counterparty: string
+  timestamp: string
+  status: "success" | "failed"
+}
+
 export interface WalletInfo {
   address: string
   network: string

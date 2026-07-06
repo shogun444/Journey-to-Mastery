@@ -17,23 +17,17 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
     return (
       <Dialog open={open} onClose={onClose} title="Connected Wallet">
         <div className="flex flex-col gap-3">
-          <div className="rounded-xl bg-[var(--glass)] p-[1px] ring-1 ring-[var(--glass-border)]">
-            <div className="rounded-[calc(0.75rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent px-4 py-3">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Address</p>
-              <p className="mt-1 font-mono text-sm text-[var(--glass-text)] break-all">{wallet.address}</p>
-            </div>
+          <div className="rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] px-4 py-3">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Address</p>
+            <p className="mt-1 font-mono text-sm text-[var(--color-text-primary)] break-all">{wallet.address}</p>
           </div>
-          <div className="rounded-xl bg-[var(--glass)] p-[1px] ring-1 ring-[var(--glass-border)]">
-            <div className="rounded-[calc(0.75rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent px-4 py-3">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Wallet</p>
-              <p className="mt-1 text-sm text-[var(--glass-text)]">{wallet.walletName}</p>
-            </div>
+          <div className="rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] px-4 py-3">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Wallet</p>
+            <p className="mt-1 text-sm text-[var(--color-text-primary)]">{wallet.walletName}</p>
           </div>
-          <div className="rounded-xl bg-[var(--glass)] p-[1px] ring-1 ring-[var(--glass-border)]">
-            <div className="rounded-[calc(0.75rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent px-4 py-3">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Network</p>
-              <p className="mt-1 text-sm text-[var(--glass-text)]">{wallet.network}</p>
-            </div>
+          <div className="rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] px-4 py-3">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Network</p>
+            <p className="mt-1 text-sm text-[var(--color-text-primary)]">{wallet.network}</p>
           </div>
           <div className="mt-1">
             <Button

@@ -26,16 +26,16 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         )}
         <div
           className={cn(
-            "rounded-xl bg-[var(--glass)] p-[1px] ring-1 ring-[var(--glass-border)] transition-all duration-300 focus-within:ring-blue-500/40 focus-within:shadow-[var(--shadow-glow-blue)]",
-            error && "ring-red-500/40"
+            "rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] transition-all duration-300 focus-within:border-blue-500/40",
+            error && "border-red-500/40"
           )}
         >
-          <div className="relative rounded-[calc(0.75rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent">
+          <div className="relative">
             <select
               ref={ref}
               id={selectId}
               className={cn(
-                "h-10 w-full appearance-none rounded-[calc(0.75rem-1px)] bg-transparent px-4 pr-10 text-sm text-[var(--glass-text)] outline-none",
+                "h-10 w-full appearance-none rounded-xl bg-transparent px-4 pr-10 text-sm text-[var(--color-text-primary)] outline-none",
                 className
               )}
               {...props}

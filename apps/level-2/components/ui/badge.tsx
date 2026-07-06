@@ -7,7 +7,7 @@ interface BadgeProps {
 }
 
 const variantStyles = {
-  default: "bg-[var(--glass)] text-zinc-500 ring-1 ring-[var(--glass-border)]",
+  default: "bg-[var(--color-surface-elevated)] text-zinc-500 border border-[var(--color-border)]",
   success: "bg-emerald-500/8 text-emerald-400 ring-1 ring-emerald-500/15",
   error: "bg-red-500/8 text-red-400 ring-1 ring-red-500/15",
   warning: "bg-amber-500/8 text-amber-400 ring-1 ring-amber-500/15",

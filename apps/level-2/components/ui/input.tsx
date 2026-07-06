@@ -19,15 +19,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div
           className={cn(
-            "rounded-xl bg-[var(--glass)] p-[1px] ring-1 transition-all duration-300",
-            error ? "ring-red-500/40" : "ring-[var(--glass-border)] focus-within:ring-blue-500/40 focus-within:shadow-[var(--shadow-glow-blue)]"
+            "rounded-xl bg-[var(--color-surface-elevated)] border transition-all duration-300",
+            error ? "border-red-500/40" : "border-[var(--color-border)] focus-within:border-blue-500/40"
           )}
         >
           <input
             ref={ref}
             id={inputId}
             className={cn(
-              "h-10 w-full rounded-[calc(0.75rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent px-4 text-sm text-[var(--glass-text)] placeholder:text-zinc-500 outline-none transition-all duration-300",
+              "h-10 w-full rounded-xl bg-transparent px-4 text-sm text-[var(--color-text-primary)] placeholder:text-zinc-500 outline-none transition-all duration-300",
               className
             )}
             {...props}

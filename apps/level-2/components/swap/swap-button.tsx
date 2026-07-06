@@ -10,6 +10,7 @@ interface SwapButtonProps {
   hasAmount: boolean
   hasTokens: boolean
   hasBalance: boolean
+  hasRate: boolean
   txState: TxState
   onSwap: () => void
 }
@@ -19,6 +20,7 @@ export function SwapButton({
   hasAmount,
   hasTokens,
   hasBalance,
+  hasRate,
   txState,
   onSwap,
 }: SwapButtonProps) {
@@ -29,11 +31,12 @@ export function SwapButton({
     if (!hasTokens) return "Select Tokens"
     if (!hasAmount) return "Enter Amount"
     if (!hasBalance) return "Insufficient Balance"
+    if (!hasRate) return "No Liquidity"
     if (isProcessing) return txState.message ?? "Processing..."
     return "Swap"
   }
 
-  const isDisabled = !connected || !hasTokens || !hasAmount || !hasBalance || isProcessing
+  const isDisabled = !connected || !hasTokens || !hasAmount || !hasBalance || !hasRate || isProcessing
 
   return (
     <div className="flex items-center gap-2">

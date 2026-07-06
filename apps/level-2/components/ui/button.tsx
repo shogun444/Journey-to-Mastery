@@ -11,9 +11,9 @@ const variantStyles = {
   primary:
     "bg-blue-500 text-white hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(59,130,246,0.25)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.35)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]",
   secondary:
-    "bg-[var(--glass)] text-[var(--glass-text)] hover:bg-[var(--glass-hover)] disabled:opacity-40 disabled:cursor-not-allowed ring-1 ring-[var(--glass-border)] shadow-[var(--shadow-card)]",
+    "bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] disabled:opacity-40 disabled:cursor-not-allowed border border-[var(--color-border)]",
   ghost:
-    "bg-transparent text-zinc-500 hover:bg-[var(--glass)] hover:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed",
+    "bg-transparent text-zinc-500 hover:bg-[var(--color-surface-hover)] hover:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed",
   danger:
     "bg-red-500/15 text-red-400 hover:bg-red-500/25 disabled:opacity-40 disabled:cursor-not-allowed ring-1 ring-red-500/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]",
 }

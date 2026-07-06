@@ -11,14 +11,12 @@ export function Card({ title, children, className }: CardProps) {
   return (
     <div
       className={cn(
-        "rounded-2xl bg-[var(--glass)] p-[1px] shadow-[var(--shadow-card)] ring-1 ring-[var(--glass-border)]",
+        "rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] p-5",
         className
       )}
     >
-      <div className="rounded-[calc(2rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]">
-        {title && <Subheading>{title}</Subheading>}
-        {children}
-      </div>
+      {title && <Subheading>{title}</Subheading>}
+      {children}
     </div>
   )
 }

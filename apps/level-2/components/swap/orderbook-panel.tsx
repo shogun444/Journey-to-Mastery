@@ -12,10 +12,10 @@ interface OrderbookPanelProps {
 export function OrderbookPanel({ bids, asks, loading }: OrderbookPanelProps) {
   if (loading) {
     return (
-      <div className="animate-pulse rounded-2xl bg-[var(--glass)] p-[1px] shadow-[var(--shadow-card)] ring-1 ring-[var(--glass-border)]">
-        <div className="space-y-3 rounded-[calc(2rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent p-4">
+      <div className="animate-pulse rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] p-4">
+        <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-3.5 rounded-md bg-[var(--glass-hover)]" />
+            <div key={i} className="h-3.5 rounded-md bg-[var(--color-surface-hover)]" />
           ))}
         </div>
       </div>
@@ -29,9 +29,8 @@ export function OrderbookPanel({ bids, asks, loading }: OrderbookPanelProps) {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-      className="rounded-2xl bg-[var(--glass)] p-[1px] shadow-[var(--shadow-card)] ring-1 ring-[var(--glass-border)]"
+      className="rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] p-4"
     >
-      <div className="rounded-[calc(2rem-1px)] bg-gradient-to-b from-[var(--glass-gradient)] to-transparent p-4">
         <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.15em] text-zinc-500">Orderbook</p>
 
         <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.15em] text-zinc-600">
@@ -59,7 +58,7 @@ export function OrderbookPanel({ bids, asks, loading }: OrderbookPanelProps) {
           ))}
         </div>
 
-        <div className="my-2 border-t border-[var(--glass-border)]" />
+        <div className="my-2 border-t border-[var(--color-border)]" />
 
         <div className="space-y-0.5">
           {bids.slice(0, 6).map((bid) => (
@@ -78,7 +77,6 @@ export function OrderbookPanel({ bids, asks, loading }: OrderbookPanelProps) {
               </span>
             </div>
           ))}
-        </div>
       </div>
     </motion.div>
   )

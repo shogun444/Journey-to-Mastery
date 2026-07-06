@@ -7,9 +7,9 @@ interface HeadingProps {
 }
 
 const styles = {
-  h1: "text-3xl md:text-4xl font-bold tracking-tight leading-tight",
-  h2: "text-xl md:text-2xl font-semibold tracking-tight leading-snug",
-  h3: "text-lg font-medium leading-snug",
+  h1: "text-4xl md:text-5xl font-bold tracking-tight leading-tight",
+  h2: "text-2xl md:text-3xl font-bold tracking-tight leading-snug",
+  h3: "text-xl font-bold leading-snug",
 }
 
 export function Heading({ as: Tag = "h1", children, className }: HeadingProps) {

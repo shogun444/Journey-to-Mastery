@@ -16,6 +16,7 @@ export function useSwap() {
       sourceToken: Token,
       destToken: Token,
       amount: string,
+      receiveAmount: string,
       slippage: number,
       path: StellarSdk.Asset[]
     ) => {
@@ -30,7 +31,13 @@ export function useSwap() {
         return
       }
 
-      const minAmountOut = calculateMinOut(amount, slippage)
+      const parsedReceive = Number.parseFloat(receiveAmount)
+      if (Number.isNaN(parsedReceive) || parsedReceive <= 0) {
+        setTxState({ status: "failed", error: "Invalid estimated receive amount" })
+        return
+      }
+
+      const minAmountOut = calculateMinOut(receiveAmount, slippage)
 
       try {
         setTxState({ status: "building", message: "Building transaction..." })
