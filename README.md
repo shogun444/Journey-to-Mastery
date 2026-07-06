@@ -53,18 +53,54 @@ Open [http://localhost:3001](http://localhost:3001).
 | Package manager | pnpm 9 |
 | Dev port | 3001 |
 
+## Level 2: Token Swap Interface (Blue Belt) 🚧
+
+A token swap dApp leveraging the Stellar DEX orderbook with multi-wallet support. Connect any Stellar wallet (Freighter, LOBSTR, xBull, Albedo, Rabet, Hana), view token balances, and execute swaps via classic path payments.
+
+Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **@stellar/stellar-sdk**, **@creit.tech/stellar-wallets-kit**, and **motion/react**.
+
+### Features
+
+- Multi-wallet support (Freighter, LOBSTR, xBull, Albedo, Rabet, Hana)
+- Token balance display (XLM, USDC, Aqua, more)
+- DEX orderbook integration via Horizon
+- Path payment swaps (`PathPaymentStrictSend`)
+- Real-time swap rate with slippage tolerance
+- Transaction status polling (pending → success/fail)
+- Smart contract event emission for off-chain tracking
+- Clean minimalist UI with spring animations
+- Dark mode
+
+### Setup
+
+```sh
+cd apps/level-2
+pnpm install
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Smart Contract
+
+Deployed AMM contract on Stellar testnet wrapping DEX path payments with `SwapExecuted` events.
+
 ## Future Levels
 
 | Level | Topic | Status |
 |---|---|---|
 | **1** | Simple Payment dApp (White Belt) | ✅ Complete |
-| **2** | TBD | — |
+| **2** | Token Swap Interface (Blue Belt) | 🚧 In Progress |
 
 ## Commands
 
 ```sh
-pnpm dev --filter=docs    # Level 1 dev server (port 3001)
-pnpm build --filter=docs  # Build Level 1
-pnpm lint --filter=docs   # Lint Level 1
-pnpm check-types --filter=docs  # TypeScript check
+pnpm dev --filter=docs     # Level 1 dev server (port 3001)
+pnpm build --filter=docs   # Build Level 1
+pnpm lint --filter=docs    # Lint Level 1
+pnpm check-types --filter=docs  # TypeScript check (Level 1)
+pnpm dev --filter=web      # Level 2 dev server (port 3000)
+pnpm build --filter=web    # Build Level 2
+pnpm lint --filter=web     # Lint Level 2
+pnpm check-types --filter=web   # TypeScript check (Level 2)
 ```
