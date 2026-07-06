@@ -277,8 +277,7 @@ impl Vault {
             .get(&DataKey::WithdrawFeeBps)
             .unwrap();
         let gross_assets = assets * MAX_BPS as i128 / (MAX_BPS as i128 - withdraw_fee_bps as i128);
-        let shares = gross_assets * total_supply / total_assets;
-        shares
+        gross_assets * total_supply / total_assets
     }
 
     pub fn preview_mint(env: Env, shares: i128) -> i128 {
