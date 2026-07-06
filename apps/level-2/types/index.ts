@@ -32,6 +32,7 @@ export type TxStatus = "idle" | "building" | "signing" | "submitting" | "pending
 export interface TxState {
   status: TxStatus
   hash?: string
+  contractTxHash?: string
   error?: string
   message?: string
 }

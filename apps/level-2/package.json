@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+    "check-types": "next typegen && tsc --noEmit",
+    "contract:build": "cd contracts/amm && cargo build --target wasm32v1-none --release",
+    "contract:deploy": "cd contracts/amm && stellar contract deploy --wasm target/wasm32v1-none/release/amm_contract.wasm --source deployer-key --network testnet"
   },
   "dependencies": {
     "@creit.tech/stellar-wallets-kit": "^2.5.0",

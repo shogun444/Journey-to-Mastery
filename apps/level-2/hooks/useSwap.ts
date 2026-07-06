@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react"
 import * as StellarSdk from "@stellar/stellar-sdk"
 import { useStellarWallet } from "./useStellarWallet"
-import { buildSwapTx, submitTransaction } from "@/lib/transactions"
+import { buildSwapTx, submitTransaction, buildContractLogTx, submitContractLog } from "@/lib/transactions"
 import { calculateMinOut } from "@/lib/dex"
 import type { Token, TxState } from "@/types"
 
@@ -92,9 +92,55 @@ export function useSwap() {
     [wallet, sign]
   )
 
+  const logSwapOnContract = useCallback(
+    async (
+      sourceToken: Token,
+      destToken: Token,
+      amount: string,
+      receiveAmount: string
+    ) => {
+      if (!wallet) {
+        setTxState({ status: "failed", error: "Wallet not connected" })
+        return
+      }
+
+      try {
+        setTxState((prev) => ({ ...prev, status: "building", message: "Building contract log tx..." }))
+
+        const xdr = await buildContractLogTx(
+          wallet.address,
+          sourceToken.code,
+          sourceToken.code === "XLM" ? "" : sourceToken.issuer,
+          destToken.code,
+          destToken.code === "XLM" ? "" : destToken.issuer,
+          amount,
+          receiveAmount
+        )
+
+        setTxState((prev) => ({ ...prev, status: "signing", message: "Please sign contract log in your wallet..." }))
+
+        const signedXdr = await sign(xdr)
+
+        setTxState((prev) => ({ ...prev, status: "submitting", message: "Submitting contract log..." }))
+
+        const result = await submitContractLog(signedXdr)
+
+        setTxState((prev) => ({
+          ...prev,
+          contractTxHash: result.hash,
+          message: `Swap logged on chain!`,
+        }))
+      } catch (err: unknown) {
+        const msg = (err as { message?: string })?.message ?? ""
+        setTxState((prev) => ({ ...prev, error: msg || "Contract log failed." }))
+      }
+    },
+    [wallet, sign]
+  )
+
   const resetTxState = useCallback(() => {
     setTxState({ status: "idle" })
   }, [])
 
-  return { txState, executeSwap, resetTxState }
+  return { txState, executeSwap, logSwapOnContract, resetTxState }
 }

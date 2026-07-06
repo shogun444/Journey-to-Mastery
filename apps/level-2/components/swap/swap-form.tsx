@@ -24,7 +24,7 @@ export function SwapForm({ onSwapSuccess }: SwapFormProps) {
   const { wallet } = useStellarWallet()
   const { getTokenBalance, refetch: refetchBalances } = useBalance(wallet?.address ?? null)
   const { bids, asks, loading: obLoading, fetchOrderbook } = useOrderbook()
-  const { txState, executeSwap, resetTxState } = useSwap()
+  const { txState, executeSwap, logSwapOnContract, resetTxState } = useSwap()
 
   const [sourceToken, setSourceToken] = useState<Token>(STELLAR_TOKENS[0]!)
   const [destToken, setDestToken] = useState<Token>(STELLAR_TOKENS[1]!)
@@ -34,6 +34,7 @@ export function SwapForm({ onSwapSuccess }: SwapFormProps) {
 
   const sourceBalance = wallet ? getTokenBalance(sourceToken) : "0"
   const hasBalance = sourceBalance !== "0" && Number.parseFloat(sourceBalance) >= Number.parseFloat(amount || "0")
+  const [lastSwap, setLastSwap] = useState<{ sourceToken: Token; destToken: Token; amount: string; receiveAmount: string } | null>(null)
   const hasAmount = amount !== "" && Number.parseFloat(amount) > 0
   const hasTokens = sourceToken.code !== destToken.code
   const bestAsk = asks[0]
@@ -69,8 +70,11 @@ export function SwapForm({ onSwapSuccess }: SwapFormProps) {
     if (txState.status === "success") {
       refetchBalances()
       onSwapSuccess?.()
+      if (receiveAmount) {
+        setLastSwap({ sourceToken, destToken, amount, receiveAmount })
+      }
     }
-  }, [txState.status, refetchBalances, onSwapSuccess])
+  }, [txState.status, refetchBalances, onSwapSuccess, sourceToken, destToken, amount, receiveAmount])
 
   const handleSwitchTokens = useCallback(() => {
     setSourceToken(destToken)
@@ -264,7 +268,11 @@ export function SwapForm({ onSwapSuccess }: SwapFormProps) {
         onSwap={handleSwap}
       />
 
-      <TransactionStatus txState={txState} onDismiss={resetTxState} />
+      <TransactionStatus
+        txState={txState}
+        onDismiss={resetTxState}
+        onContractLog={lastSwap ? () => logSwapOnContract(lastSwap.sourceToken, lastSwap.destToken, lastSwap.amount, lastSwap.receiveAmount) : undefined}
+      />
     </motion.div>
   )
 }

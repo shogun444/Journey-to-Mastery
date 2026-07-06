@@ -98,6 +98,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Deployed AMM contract on Stellar testnet wrapping DEX path payments with `SwapExecuted` events.
 
+- **Contract ID:** `CCKWIHACAVZC5OBGR7W2HL43KKOYYCL3XZJD5APOUFYBWMBS2FZXWYAF`
+- **Deploy Tx:** [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/99eae42899d64d41f529e6ceeed98c1520b063d19a441fe3786c972d80953e27)
+- **Contract Call Tx:** [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/416fb36f7cf87101400adc34ba5b4f49547bb71854aacf200502981a2fc4144f)
+
 ## Future Levels
 
 | Level | Topic | Status |

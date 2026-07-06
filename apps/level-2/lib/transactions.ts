@@ -1,5 +1,5 @@
 import * as StellarSdk from "@stellar/stellar-sdk"
-import { rpc, horizon, config } from "./stellar"
+import { rpc, horizon, config, AMM_CONTRACT_ID } from "./stellar"
 
 function isClassicTx(transaction: StellarSdk.Transaction | StellarSdk.FeeBumpTransaction): boolean {
   if (transaction instanceof StellarSdk.FeeBumpTransaction) return false
@@ -81,6 +81,83 @@ async function submitSoroban(signedXdr: string): Promise<{ hash: string; status:
   }
 
   return { hash: sendResponse.hash, status: "failed" }
+}
+
+export async function buildContractLogTx(
+  sourceAddress: string,
+  sourceCode: string,
+  sourceIssuer: string,
+  destCode: string,
+  destIssuer: string,
+  amountIn: string,
+  amountOut: string
+): Promise<string> {
+  const account = await rpc.getAccount(sourceAddress)
+  const seq = typeof account.sequenceNumber === "function" ? account.sequenceNumber() : account.sequenceNumber
+  const stellarAccount = new StellarSdk.Account(sourceAddress, seq)
+
+  const contract = new StellarSdk.Contract(AMM_CONTRACT_ID)
+
+  const swapScVal = StellarSdk.nativeToScVal(
+    {
+      sender: sourceAddress,
+      source_asset: sourceCode,
+      source_issuer: sourceIssuer,
+      dest_asset: destCode,
+      dest_issuer: destIssuer,
+      amount_in: BigInt(amountIn),
+      amount_out: BigInt(amountOut),
+    },
+    {
+      type: {
+        sender: "address",
+        source_asset: "string",
+        source_issuer: "string",
+        dest_asset: "string",
+        dest_issuer: "string",
+        amount_in: "i128",
+        amount_out: "i128",
+      },
+    }
+  )
+
+  let tx = new StellarSdk.TransactionBuilder(stellarAccount, {
+    fee: "100000",
+    networkPassphrase: config.networkPassphrase,
+  })
+    .addOperation(contract.call("swap", swapScVal))
+    .setTimeout(300)
+    .build()
+
+  const sim = await rpc.simulateTransaction(tx)
+
+  if (StellarSdk.rpc.Api.isSimulationError(sim)) {
+    throw new Error(`Contract simulation failed: ${sim.error}`)
+  }
+
+  tx = StellarSdk.rpc.assembleTransaction(tx, sim).build()
+  return tx.toXDR()
+}
+
+export async function submitContractLog(signedXdr: string): Promise<{ hash: string }> {
+  const tx = StellarSdk.TransactionBuilder.fromXDR(signedXdr, config.networkPassphrase) as StellarSdk.Transaction
+  const response = await rpc.sendTransaction(tx)
+
+  if (response.status === "ERROR") {
+    throw new Error("Contract call transaction failed")
+  }
+
+  let getResponse = await rpc.getTransaction(response.hash)
+  while (getResponse.status === "NOT_FOUND") {
+    await new Promise((r) => setTimeout(r, 1000))
+    getResponse = await rpc.getTransaction(response.hash)
+  }
+
+  if (getResponse.status !== "SUCCESS") {
+    throw new Error("Contract call tx not confirmed")
+  }
+
+  return { hash: response.hash }
 }
 
 export function getStellarExpertUrl(hash: string): string {

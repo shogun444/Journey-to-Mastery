@@ -57,6 +57,9 @@ The AMM contract at `contracts/amm/` wraps Stellar DEX path payments with event 
 ### Deployed Contract
 
 - **Network:** Stellar Testnet
+- **AMM Contract ID:** `CCKWIHACAVZC5OBGR7W2HL43KKOYYCL3XZJD5APOUFYBWMBS2FZXWYAF`
+- **Deploy Tx:** [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/99eae42899d64d41f529e6ceeed98c1520b063d19a441fe3786c972d80953e27)
+- **Contract Call Tx:** [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/416fb36f7cf87101400adc34ba5b4f49547bb71854aacf200502981a2fc4144f)
 - **USDC SAC Contract ID:** `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA`
 
 ### Functions
@@ -133,8 +136,9 @@ contracts/amm/
 - [x] README with project description and setup instructions
 - [x] Minimum 2+ meaningful commits in git history
 - [x] Screenshots included (home, multi-wallet modal, wallet approval, successful tx, StellarExpert, USDC balance, cancelled tx)
-- [x] Deployed contract address in README
-- [x] Transaction hash verifiable on StellarExpert
+- [x] Deployed contract address in README (`CCKWIHACAVZC5OBGR7W2HL43KKOYYCL3XZJD5APOUFYBWMBS2FZXWYAF`)
+- [x] Transaction hash of a contract call verifiable on StellarExpert (`416fb36f7cf87101400adc34ba5b4f49547bb71854aacf200502981a2fc4144f`)
+- [x] Contract emits `SwapExecuted` events
 - [x] 3+ error types handled (wallet not found, insufficient balance, user rejection, network mismatch, slippage exceeded, tx failure)
 - [x] Multi-wallet integration (Freighter, LOBSTR, xBull, Albedo, Rabet, Hana)
 - [x] Transaction status polling (pending, success, fail)

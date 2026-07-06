@@ -22,3 +22,5 @@ export const rpc = new StellarSdk.rpc.Server(config.rpcUrl)
 
 export const STELLAR_EXPERT_URL =
   NETWORK === "testnet" ? "https://stellar.expert/explorer/testnet" : "https://stellar.expert/explorer/public"
+
+export const AMM_CONTRACT_ID = "CCKWIHACAVZC5OBGR7W2HL43KKOYYCL3XZJD5APOUFYBWMBS2FZXWYAF"

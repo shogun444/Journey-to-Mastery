@@ -9,9 +9,10 @@ import { CheckCircle, XCircle, Spinner, ArrowSquareOut, X } from "@phosphor-icon
 interface TransactionStatusProps {
   txState: TxState
   onDismiss: () => void
+  onContractLog?: () => void
 }
 
-export function TransactionStatus({ txState, onDismiss }: TransactionStatusProps) {
+export function TransactionStatus({ txState, onDismiss, onContractLog }: TransactionStatusProps) {
   if (txState.status === "idle") return null
 
   return (
@@ -75,6 +76,28 @@ export function TransactionStatus({ txState, onDismiss }: TransactionStatusProps
                   className="mt-2 inline-flex items-center gap-1 text-xs text-blue-400/80 transition-colors duration-200 hover:text-blue-300"
                 >
                   View on StellarExpert
+                  <ArrowSquareOut size={11} />
+                </a>
+              )}
+
+              {txState.status === "success" && onContractLog && !txState.contractTxHash && (
+                <button
+                  onClick={onContractLog}
+                  className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-400/80 transition-colors duration-200 hover:text-emerald-300"
+                >
+                  Log Swap on Stellar
+                  <ArrowSquareOut size={11} />
+                </button>
+              )}
+
+              {txState.contractTxHash && (
+                <a
+                  href={getStellarExpertUrl(txState.contractTxHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-400/80 transition-colors duration-200 hover:text-emerald-300"
+                >
+                  View Contract Log on StellarExpert
                   <ArrowSquareOut size={11} />
                 </a>
               )}
