@@ -23,16 +23,15 @@ interface UnstakeFormProps {
 
 export function UnstakeForm({ exchangeRate, vaultLoading, onSuccess }: UnstakeFormProps) {
   const { address, sign } = useStellarWallet()
-  useBalance(address)
+  const { stXlmBalance } = useBalance(address)
   const { state, withdraw, reset } = useStake()
   const [amount, setAmount] = useState("")
 
   const amountNum = Number.parseFloat(amount) || 0
   const rate = Number.parseFloat(exchangeRate) || 1
   const previewXlm = amountNum > 0 ? (amountNum * rate).toFixed(7) : "0"
-  const stxlmBalance = "0"
 
-  const handleMax = () => setAmount(stxlmBalance)
+  const handleMax = () => setAmount(stXlmBalance)
   const handleWithdraw = async () => {
     if (!address || !amount) return
     await withdraw(address, sign, (amountNum * 1e7).toFixed(0))
@@ -46,7 +45,7 @@ export function UnstakeForm({ exchangeRate, vaultLoading, onSuccess }: UnstakeFo
       <Card className="p-6 max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-5">
           <Heading as="h2">Unstake stXLM</Heading>
-          <Badge variant="default">1 stXLM ≈ {exchangeRate} XLM</Badge>
+          <Badge variant="default">1 stXLM ≈ {rate.toFixed(4)} XLM</Badge>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -60,7 +59,7 @@ export function UnstakeForm({ exchangeRate, vaultLoading, onSuccess }: UnstakeFo
           />
 
           <div className="flex items-center justify-between text-xs">
-            <span className="text-zinc-500">Balance: {stxlmBalance} stXLM</span>
+            <span className="text-zinc-500">Balance: {stXlmBalance} stXLM</span>
             <button
               onClick={handleMax}
               className="text-blue-400 hover:text-blue-300 transition-colors"

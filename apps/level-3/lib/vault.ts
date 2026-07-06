@@ -5,6 +5,26 @@ function vaultContract() {
   return new StellarSdk.Contract(VAULT_CONTRACT_ID)
 }
 
+async function simulateCall(fn: string, ...args: StellarSdk.xdr.ScVal[]): Promise<string | null> {
+  try {
+    const sim = await getRpc().simulateTransaction(
+      new StellarSdk.TransactionBuilder(await getRpc().getAccount(VAULT_CONTRACT_ID), {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: config.networkPassphrase,
+      })
+        .addOperation(vaultContract().call(fn, ...args))
+        .setTimeout(30)
+        .build()
+    )
+    if (StellarSdk.rpc.Api.isSimulationSuccess(sim) && sim.result) {
+      return String(StellarSdk.scValToNative(sim.result.retval))
+    }
+  } catch {
+    // silent
+  }
+  return null
+}
+
 export async function getVaultState(): Promise<{
   totalAssets: string
   totalSupply: string
@@ -12,30 +32,36 @@ export async function getVaultState(): Promise<{
   depositFeeBps: number
   withdrawFeeBps: number
 }> {
-  try {
-    const contract = vaultContract()
-    const sim = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(await getRpc().getAccount(VAULT_CONTRACT_ID), {
-        fee: StellarSdk.BASE_FEE,
-        networkPassphrase: config.networkPassphrase,
-      })
-        .addOperation(contract.call("total_assets"))
-        .setTimeout(30)
-        .build()
-    )
-    if (StellarSdk.rpc.Api.isSimulationSuccess(sim) && sim.result) {
-      return {
-        totalAssets: String(StellarSdk.scValToNative(sim.result.retval)),
-        totalSupply: "0",
-        paused: false,
-        depositFeeBps: 0,
-        withdrawFeeBps: 0,
-      }
-    }
-    return { totalAssets: "0", totalSupply: "0", paused: false, depositFeeBps: 0, withdrawFeeBps: 0 }
-  } catch {
-    return { totalAssets: "0", totalSupply: "0", paused: false, depositFeeBps: 0, withdrawFeeBps: 0 }
+  const [totalAssets, totalSupply, paused, depositFeeBps, withdrawFeeBps] = await Promise.all([
+    simulateCall("total_assets"),
+    simulateCall("total_supply"),
+    simulateCall("paused"),
+    simulateCall("deposit_fee_bps"),
+    simulateCall("withdraw_fee_bps"),
+  ])
+  return {
+    totalAssets: totalAssets ?? "0",
+    totalSupply: totalSupply ?? "0",
+    paused: paused === "true",
+    depositFeeBps: Number(depositFeeBps ?? "0"),
+    withdrawFeeBps: Number(withdrawFeeBps ?? "0"),
   }
+}
+
+export async function getExchangeRate(): Promise<string> {
+  const result = await simulateCall("exchange_rate")
+  if (!result) return "1.0000"
+  try {
+    const parsed = JSON.parse(result)
+    if (Array.isArray(parsed) && parsed.length === 2) {
+      const num = Number(parsed[0])
+      const den = Number(parsed[1])
+      if (den > 0) return (num / den).toFixed(7)
+    }
+  } catch {
+    // silent
+  }
+  return "1.0000"
 }
 
 export async function previewDeposit(assets: string): Promise<string> {
@@ -100,7 +126,10 @@ export async function buildDepositTx(source: string, assets: string): Promise<st
 
   const simulation = await getRpc().simulateTransaction(tx)
   if (StellarSdk.rpc.Api.isSimulationError(simulation)) {
-    throw new Error(`Simulation failed: ${simulation.error}`)
+    const msg = simulation.error?.includes("resulting balance is not within the allowed range")
+      ? "Insufficient XLM balance"
+      : `Simulation failed: ${simulation.error}`
+    throw new Error(msg)
   }
 
   const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build()

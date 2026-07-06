@@ -25,9 +25,11 @@ export async function submitSorobanTransaction(signedXdr: string): Promise<{ has
   }
 
   let getResponse = await getRpc().getTransaction(response.hash)
-  while (getResponse.status === "NOT_FOUND") {
+  let retries = 0
+  while (getResponse.status === "NOT_FOUND" && retries < 30) {
     await new Promise((resolve) => setTimeout(resolve, 1000))
     getResponse = await getRpc().getTransaction(response.hash)
+    retries++
   }
 
   if (getResponse.status === "SUCCESS") {

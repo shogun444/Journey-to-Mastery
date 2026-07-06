@@ -6,10 +6,15 @@ import { StakeForm } from "@/components/stake/stake-form"
 import { StakeStats } from "@/components/stake/stake-stats"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
 import { useBalance } from "@/hooks/useBalance"
+import { useVault } from "@/hooks/useVault"
 
 export default function StakePage() {
   const { address } = useStellarWallet()
-  const { xlmBalance } = useBalance(address)
+  const { xlmBalance, stXlmBalance } = useBalance(address)
+  const { exchangeRate, loading: vaultLoading } = useVault()
+
+  const rate = Number(exchangeRate)
+  const apy = rate > 1 ? ((rate - 1) * 100).toFixed(2) : "0.00"
 
   return (
     <div className="flex flex-col gap-8">
@@ -22,14 +27,14 @@ export default function StakePage() {
         <StakeStats
           items={[
             { label: "XLM Balance", value: `${Number.parseFloat(xlmBalance).toFixed(2)} XLM`, monospace: true },
-            { label: "stXLM Balance", value: "0.00 stXLM", monospace: true, accent: true },
-            { label: "Exchange Rate", value: "1.0000", monospace: true },
-            { label: "APY", value: "0.00%", monospace: true },
+            { label: "stXLM Balance", value: `${Number.parseFloat(stXlmBalance).toFixed(2)} stXLM`, monospace: true, accent: true },
+            { label: "Exchange Rate", value: vaultLoading ? "..." : rate.toFixed(4), monospace: true },
+            { label: "APY", value: `${apy}%`, monospace: true },
           ]}
         />
       )}
 
-      <StakeForm exchangeRate="1.0000" vaultLoading={false} />
+      <StakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} />
     </div>
   )
 }

@@ -4,19 +4,27 @@ import { motion } from "motion/react"
 import { Card } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Subheading } from "@/components/ui/subheading"
-
-const metrics = [
-  { label: "Total Value Locked", value: "0.00 XLM", desc: "Total XLM deposited in the vault" },
-  { label: "Current APY", value: "0.00%", desc: "Annualized yield rate", accent: true },
-  { label: "Total Supply", value: "0.00 stXLM", desc: "Total stXLM tokens minted" },
-  { label: "Exchange Rate", value: "1.0000", desc: "1 stXLM equals this much XLM", monospace: true },
-  { label: "Total Stakers", value: "0", desc: "Unique addresses with stXLM balance" },
-  { label: "Protocol Revenue", value: "0.00 XLM", desc: "Total fees collected" },
-  { label: "Today's Yield", value: "0.00 XLM", desc: "Yield accrued today", accent: true },
-  { label: "24h Volume", value: "0.00 XLM", desc: "Total staking volume in last 24h" },
-]
+import { useVault } from "@/hooks/useVault"
 
 export default function AnalyticsPage() {
+  const { vaultState, exchangeRate } = useVault()
+
+  const totalAssets = (Number(vaultState.totalAssets) / 10_000_000).toFixed(2)
+  const totalSupply = (Number(vaultState.totalSupply) / 10_000_000).toFixed(2)
+  const rate = Number(exchangeRate)
+  const apy = rate > 1 ? ((rate - 1) * 100).toFixed(2) : "0.00"
+
+  const metrics = [
+    { label: "Total Value Locked", value: `${totalAssets} XLM`, desc: "Total XLM deposited in the vault" },
+    { label: "Current APY", value: `${apy}%`, desc: "Annualized yield rate", accent: true },
+    { label: "Total Supply", value: `${totalSupply} stXLM`, desc: "Total stXLM tokens minted" },
+    { label: "Exchange Rate", value: rate.toFixed(4), desc: "1 stXLM equals this much XLM", monospace: true },
+    { label: "Deposit Fee", value: `${vaultState.depositFeeBps / 100}%`, desc: "Current deposit fee" },
+    { label: "Withdraw Fee", value: `${vaultState.withdrawFeeBps / 100}%`, desc: "Current withdraw fee" },
+    { label: "Paused", value: vaultState.paused ? "Yes" : "No", desc: "Vault operational status" },
+    { label: "TVL Change", value: "—", desc: "Tracked over time once volume accumulates" },
+  ]
+
   return (
     <div className="flex flex-col gap-8">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>

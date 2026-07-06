@@ -29,7 +29,8 @@ export function StakeForm({ exchangeRate, vaultLoading, onSuccess }: StakeFormPr
 
   const xlmNum = Number.parseFloat(xlmBalance)
   const amountNum = Number.parseFloat(amount) || 0
-  const previewShares = amountNum > 0 ? (amountNum * Number.parseFloat(exchangeRate || "1")).toFixed(7) : "0"
+  const rate = Number.parseFloat(exchangeRate) || 1
+  const previewShares = amountNum > 0 && rate > 0 ? (amountNum / rate).toFixed(7) : "0"
 
   const handleMax = () => setAmount(xlmBalance)
   const handleDeposit = async () => {
@@ -45,7 +46,7 @@ export function StakeForm({ exchangeRate, vaultLoading, onSuccess }: StakeFormPr
       <Card className="p-6 max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-5">
           <Heading as="h2">Stake XLM</Heading>
-          <Badge variant="default">1 stXLM ≈ {exchangeRate} XLM</Badge>
+          <Badge variant="default">1 XLM ≈ {(1 / rate).toFixed(7)} stXLM</Badge>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -86,7 +87,7 @@ export function StakeForm({ exchangeRate, vaultLoading, onSuccess }: StakeFormPr
 
           {amountNum > 0 && xlmNum > 0 && (
             <div className="flex justify-between text-xs text-zinc-500 px-1">
-              <span>Exchange rate: 1 stXLM ≈ {exchangeRate} XLM</span>
+              <span>Exchange rate: 1 XLM ≈ {(1 / rate).toFixed(7)} stXLM</span>
               <span>Fee: 0%</span>
             </div>
           )}

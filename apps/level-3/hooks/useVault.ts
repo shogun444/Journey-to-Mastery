@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import { getVaultState as fetchVaultState } from "@/lib/vault"
+import { useState, useEffect, useCallback, useRef } from "react"
+import { getVaultState as fetchVaultState, getExchangeRate as fetchExchangeRate } from "@/lib/vault"
 import type { VaultState } from "@/types"
 
 export function useVault() {
@@ -14,12 +14,17 @@ export function useVault() {
     depositFeeBps: 0,
     withdrawFeeBps: 0,
   })
+  const [exchangeRate, setExchangeRate] = useState("1.0000")
   const [loading, setLoading] = useState(false)
+  const initialised = useRef(false)
 
   const refresh = useCallback(async () => {
     setLoading(true)
     try {
-      const state = await fetchVaultState()
+      const [state, rate] = await Promise.all([
+        fetchVaultState(),
+        fetchExchangeRate(),
+      ])
       setVaultState({
         totalAssets: state.totalAssets,
         totalSupply: state.totalSupply,
@@ -29,11 +34,21 @@ export function useVault() {
         depositFeeBps: state.depositFeeBps,
         withdrawFeeBps: state.withdrawFeeBps,
       })
+      setExchangeRate(rate)
     } catch {
       // keep previous state
     }
     setLoading(false)
   }, [])
 
-  return { vaultState, loading, refresh }
+  useEffect(() => {
+    if (!initialised.current) {
+      initialised.current = true
+      refresh()
+    }
+    const interval = setInterval(refresh, 30000)
+    return () => clearInterval(interval)
+  }, [refresh])
+
+  return { vaultState, exchangeRate, loading, refresh }
 }

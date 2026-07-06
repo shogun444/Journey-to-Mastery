@@ -6,10 +6,16 @@ import { UnstakeForm } from "@/components/stake/unstake-form"
 import { StakeStats } from "@/components/stake/stake-stats"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
 import { useBalance } from "@/hooks/useBalance"
+import { useVault } from "@/hooks/useVault"
 
 export default function UnstakePage() {
   const { address } = useStellarWallet()
-  const { xlmBalance } = useBalance(address)
+  const { xlmBalance, stXlmBalance } = useBalance(address)
+  const { exchangeRate, loading: vaultLoading } = useVault()
+
+  const stxlmNum = Number(stXlmBalance)
+  const rate = Number(exchangeRate)
+  const withdrawableXlm = stxlmNum * rate
 
   return (
     <div className="flex flex-col gap-8">
@@ -22,14 +28,14 @@ export default function UnstakePage() {
         <StakeStats
           items={[
             { label: "XLM Balance", value: `${Number.parseFloat(xlmBalance).toFixed(2)} XLM`, monospace: true },
-            { label: "stXLM Balance", value: "0.00 stXLM", monospace: true, accent: true },
-            { label: "Exchange Rate", value: "1.0000", monospace: true },
-            { label: "Withdrawable", value: "0.00 XLM", monospace: true },
+            { label: "stXLM Balance", value: `${stxlmNum.toFixed(2)} stXLM`, monospace: true, accent: true },
+            { label: "Exchange Rate", value: vaultLoading ? "..." : rate.toFixed(4), monospace: true },
+            { label: "Withdrawable", value: `${withdrawableXlm.toFixed(2)} XLM`, monospace: true },
           ]}
         />
       )}
 
-      <UnstakeForm exchangeRate="1.0000" vaultLoading={false} />
+      <UnstakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} />
     </div>
   )
 }
