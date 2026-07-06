@@ -15,6 +15,24 @@ interface UseStakeReturn {
 export function useStake(): UseStakeReturn {
   const { state, updateStatus, startPolling, reset } = useTransactionStatus()
 
+  const saveTx = (type: "stake" | "unstake", amount: string, hash: string) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("stxlm_txs") || "[]")
+      stored.unshift({
+        id: hash,
+        type,
+        amount: (Number(amount) / 10_000_000).toFixed(2),
+        asset: type === "stake" ? "XLM" : "stXLM",
+        timestamp: new Date().toISOString(),
+        hash,
+        status: "success",
+      })
+      localStorage.setItem("stxlm_txs", JSON.stringify(stored.slice(0, 50)))
+    } catch {
+      // silent
+    }
+  }
+
   const deposit = async (
     source: string,
     sign: (xdr: string) => Promise<string>,
@@ -27,6 +45,7 @@ export function useStake(): UseStakeReturn {
       const signedXdr = await sign(xdr)
       updateStatus("submitting")
       const { hash } = await submitSorobanTransaction(signedXdr)
+      saveTx("stake", assets, hash)
       await startPolling(hash)
     } catch (err: unknown) {
       updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })
@@ -45,6 +64,7 @@ export function useStake(): UseStakeReturn {
       const signedXdr = await sign(xdr)
       updateStatus("submitting")
       const { hash } = await submitSorobanTransaction(signedXdr)
+      saveTx("unstake", shares, hash)
       await startPolling(hash)
     } catch (err: unknown) {
       updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })

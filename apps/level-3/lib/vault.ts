@@ -5,10 +5,14 @@ function vaultContract() {
   return new StellarSdk.Contract(VAULT_CONTRACT_ID)
 }
 
+function defaultSourceAccount() {
+  return new StellarSdk.Account(VAULT_CONTRACT_ID, "0")
+}
+
 async function simulateCall(fn: string, ...args: StellarSdk.xdr.ScVal[]): Promise<string | null> {
   try {
     const sim = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(await getRpc().getAccount(VAULT_CONTRACT_ID), {
+      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
         fee: StellarSdk.BASE_FEE,
         networkPassphrase: config.networkPassphrase,
       })
@@ -64,10 +68,36 @@ export async function getExchangeRate(): Promise<string> {
   return "1.0000"
 }
 
+export async function getUserBalance(address: string): Promise<string | null> {
+  try {
+    const sim = await getRpc().simulateTransaction(
+      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: config.networkPassphrase,
+      })
+        .addOperation(
+          vaultContract().call(
+            "get_user_balance",
+            StellarSdk.Address.fromString(address).toScVal()
+          )
+        )
+        .setTimeout(30)
+        .build()
+    )
+    if (StellarSdk.rpc.Api.isSimulationSuccess(sim) && sim.result) {
+      const raw = StellarSdk.scValToNative(sim.result.retval)
+      return (Number(raw) / 10_000_000).toFixed(7)
+    }
+  } catch {
+    // silent
+  }
+  return null
+}
+
 export async function previewDeposit(assets: string): Promise<string> {
   try {
     const simulation = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(await getRpc().getAccount(VAULT_CONTRACT_ID), {
+      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
         fee: StellarSdk.BASE_FEE,
         networkPassphrase: config.networkPassphrase,
       })
@@ -89,7 +119,7 @@ export async function previewDeposit(assets: string): Promise<string> {
 export async function previewWithdraw(shares: string): Promise<string> {
   try {
     const simulation = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(await getRpc().getAccount(VAULT_CONTRACT_ID), {
+      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
         fee: StellarSdk.BASE_FEE,
         networkPassphrase: config.networkPassphrase,
       })

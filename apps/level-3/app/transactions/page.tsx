@@ -1,24 +1,50 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 import { Card } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Badge } from "@/components/ui/badge"
+import { STELLAR_EXPERT_URL } from "@/lib/stellar"
 
-const sampleTxs = [
-  { id: "1", type: "stake" as const, amount: "1000", asset: "XLM", status: "success" as const, hash: "abc...def", time: "2m ago" },
-  { id: "2", type: "unstake" as const, amount: "500", asset: "stXLM", status: "success" as const, hash: "def...ghi", time: "15m ago" },
-  { id: "3", type: "yield" as const, amount: "2.5", asset: "XLM", status: "success" as const, hash: "ghi...jkl", time: "1h ago" },
-]
+interface Tx {
+  id: string
+  type: "stake" | "unstake"
+  amount: string
+  asset: string
+  timestamp: string
+  hash: string
+  status: "success"
+}
 
 const typeConfig = {
   stake: { label: "Stake", color: "text-emerald-400" as const, badge: "success" as const },
   unstake: { label: "Unstake", color: "text-blue-400" as const, badge: "default" as const },
-  yield: { label: "Yield", color: "text-amber-400" as const, badge: "warning" as const },
-  fee: { label: "Fee", color: "text-zinc-400" as const, badge: "default" as const },
 }
 
 export default function TransactionsPage() {
+  const [txs, setTxs] = useState<Tx[]>([])
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("stxlm_txs") || "[]")
+      setTxs(stored)
+    } catch {
+      setTxs([])
+    }
+
+    const interval = setInterval(() => {
+      try {
+        const stored = JSON.parse(localStorage.getItem("stxlm_txs") || "[]")
+        setTxs(stored)
+      } catch {
+        // silent
+      }
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="flex flex-col gap-8">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
@@ -27,17 +53,25 @@ export default function TransactionsPage() {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-        {sampleTxs.length > 0 ? (
+        {txs.length > 0 ? (
           <Card className="p-0 overflow-hidden">
             <div className="divide-y divide-zinc-800/50">
-              {sampleTxs.map((tx) => {
+              {txs.map((tx) => {
                 const cfg = typeConfig[tx.type]
+                const timeAgo = getTimeAgo(tx.timestamp)
+                const shortHash = tx.hash.slice(0, 7) + "..." + tx.hash.slice(-3)
                 return (
-                  <div key={tx.id} className="flex items-center justify-between px-5 py-4">
+                  <a
+                    key={tx.id}
+                    href={`${STELLAR_EXPERT_URL}/tx/${tx.hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between px-5 py-4 hover:bg-zinc-900 transition-colors"
+                  >
                     <div className="flex items-center gap-4">
                       <div>
                         <p className={`text-sm font-medium ${cfg.color}`}>{cfg.label}</p>
-                        <p className="text-xs text-zinc-500 mt-0.5">{tx.time}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">{timeAgo}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -45,9 +79,9 @@ export default function TransactionsPage() {
                         {tx.amount} {tx.asset}
                       </span>
                       <Badge variant={cfg.badge}>{tx.status}</Badge>
-                      <span className="text-xs font-mono text-zinc-500 w-20 text-right">{tx.hash}</span>
+                      <span className="text-xs font-mono text-zinc-500 w-24 text-right">{shortHash}</span>
                     </div>
-                  </div>
+                  </a>
                 )
               })}
             </div>
@@ -60,4 +94,14 @@ export default function TransactionsPage() {
       </motion.div>
     </div>
   )
+}
+
+function getTimeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return "Just now"
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
 }
