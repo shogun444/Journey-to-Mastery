@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/level-3/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/level-3/**"
+
+defaults:
+  run:
+    working-directory: apps/level-3
+
+jobs:
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: wasm32v1-none
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            apps/level-3/contracts/**/target/
+          key: ${{ runner.os }}-cargo-vault-${{ hashFiles('apps/level-3/contracts/**/Cargo.toml') }}
+
+      - name: Format check (stXLM)
+        run: cargo fmt --all --check
+        working-directory: apps/level-3/contracts/st-xlm
+
+      - name: Format check (vault)
+        run: cargo fmt --all --check
+        working-directory: apps/level-3/contracts/vault
+
+      - name: Clippy (stXLM)
+        run: cargo clippy -- -D warnings
+        working-directory: apps/level-3/contracts/st-xlm
+
+      - name: Clippy (vault)
+        run: cargo clippy -- -D warnings
+        working-directory: apps/level-3/contracts/vault
+
+      - name: Test (stXLM)
+        run: cargo test
+        working-directory: apps/level-3/contracts/st-xlm
+
+      - name: Test (vault)
+        run: cargo test
+        working-directory: apps/level-3/contracts/vault
+
+      - name: Build (stXLM)
+        run: cargo build --target wasm32v1-none --release
+        working-directory: apps/level-3/contracts/st-xlm
+
+      - name: Build (vault)
+        run: cargo build --target wasm32v1-none --release
+        working-directory: apps/level-3/contracts/vault
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check types
+        run: npm run check-types
+
+      - name: Build
+        run: npm run build
