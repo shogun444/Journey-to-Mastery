@@ -53,9 +53,9 @@ Open [http://localhost:3001](http://localhost:3001).
 | Package manager | pnpm 9 |
 | Dev port | 3001 |
 
-## Level 2: Token Swap Interface (Blue Belt) 🚧
+## Level 2: Token Swap Interface (Blue Belt) ✅
 
-A token swap dApp leveraging the Stellar DEX orderbook with multi-wallet support. Connect any Stellar wallet (Freighter, LOBSTR, xBull, Albedo, Rabet, Hana), view token balances, and execute swaps via classic path payments.
+A premium token swap dApp on the Stellar testnet. Multi-wallet support, DEX orderbook swaps, and high-end Ethereal Glass UI.
 
 Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **@stellar/stellar-sdk**, **@creit.tech/stellar-wallets-kit**, and **motion/react**.
 
@@ -64,12 +64,17 @@ Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **@stellar/stell
 - Multi-wallet support (Freighter, LOBSTR, xBull, Albedo, Rabet, Hana)
 - Token balance display (XLM, USDC, Aqua, more)
 - DEX orderbook integration via Horizon
-- Path payment swaps (`PathPaymentStrictSend`)
-- Real-time swap rate with slippage tolerance
+- Path payment swaps with slippage protection
+- Real-time swap rate display with orderbook depth
 - Transaction status polling (pending → success/fail)
 - Smart contract event emission for off-chain tracking
-- Clean minimalist UI with spring animations
-- Dark mode
+- **Premium UI:** Ethereal Glass design — radial gradients, noise grain texture, floating island nav, double-bezel cards, ambient shadows, spring animations
+- Dark / light mode with adaptive glass tokens
+- Comprehensive error handling (6+ types)
+
+### Screenshots
+
+> Screenshots coming soon.
 
 ### Setup
 
@@ -90,17 +95,17 @@ Deployed AMM contract on Stellar testnet wrapping DEX path payments with `SwapEx
 | Level | Topic | Status |
 |---|---|---|
 | **1** | Simple Payment dApp (White Belt) | ✅ Complete |
-| **2** | Token Swap Interface (Blue Belt) | 🚧 In Progress |
+| **2** | Token Swap Interface (Blue Belt) | ✅ Complete |
 
 ## Commands
 
 ```sh
-pnpm dev --filter=docs     # Level 1 dev server (port 3001)
-pnpm build --filter=docs   # Build Level 1
-pnpm lint --filter=docs    # Lint Level 1
-pnpm check-types --filter=docs  # TypeScript check (Level 1)
-pnpm dev --filter=web      # Level 2 dev server (port 3000)
-pnpm build --filter=web    # Build Level 2
-pnpm lint --filter=web     # Lint Level 2
-pnpm check-types --filter=web   # TypeScript check (Level 2)
+pnpm dev --filter=docs       # Level 1 dev server (port 3001)
+pnpm build --filter=docs     # Build Level 1
+pnpm lint --filter=docs      # Lint Level 1
+pnpm check-types --filter=docs   # TypeScript check (Level 1)
+pnpm dev --filter=web        # Level 2 dev server (port 3000)
+pnpm build --filter=web      # Build Level 2
+pnpm lint --filter=web       # Lint Level 2
+pnpm check-types --filter=web    # TypeScript check (Level 2)
 ```
