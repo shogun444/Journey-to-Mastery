@@ -26,20 +26,23 @@ Built with **Next.js 16**, **TypeScript strict**, **Tailwind CSS v4**, **@stella
 ### 3. Freighter Transaction Approval
 ![Freighter Transaction](screenshots/freighterTransaction.png)
 
-### 4. Successful Transaction
+### 4. Freighter Transaction Details
+![Freighter Transaction Details](screenshots/freighterTransactionDetails.png)
+
+### 5. Successful Transaction
 ![Transaction Successful](screenshots/transactionSuccesfull.png)
 
-### 5. Transaction on StellarExpert
+### 6. Transaction on StellarExpert
 ![StellarExpert Transaction](screenshots/stellarExpertTrasactionInformation.png)
 
-### 6. USDC Balance After Conversion
+### 7. USDC Balance After Conversion
 ![USDC After Conversion](screenshots/usdcAfterConversion.png)
 
-### 7. Cancelled Transaction (User Rejected)
+### 8. Cancelled Transaction (User Rejected)
 ![Cancelled Transaction](screenshots/cancelledTransaction.png)
 
 Example transaction:
-[https://stellar.expert/explorer/testnet/tx/5501bfa197fa0a644b34cc0c9f55885153faed1be24030dd55963914b3197eed](https://stellar.expert/explorer/testnet/tx/5501bfa197fa0a644b34cc0c9f55885153faed1be24030dd55963914b3197eed)
+[https://stellar.expert/explorer/testnet/tx/de2f418c7ba0998c2763bbcf7658e39966cd9d9b5bcfdc07b8ef84d0c03bbd3c](https://stellar.expert/explorer/testnet/tx/de2f418c7ba0998c2763bbcf7658e39966cd9d9b5bcfdc07b8ef84d0c03bbd3c)
 
 ## Getting Started
 

@@ -79,10 +79,11 @@ Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **@stellar/stell
 | 1. Home page (wallet connected) | ![Home](apps/level-2/screenshots/home.png) |
 | 2. Multi-wallet selection modal | ![Wallets](apps/level-2/screenshots/multipleWallets.png) |
 | 3. Freighter transaction approval | ![Freighter Tx](apps/level-2/screenshots/freighterTransaction.png) |
-| 4. Successful transaction | ![Tx Success](apps/level-2/screenshots/transactionSuccesfull.png) |
-| 5. Transaction on StellarExpert | ![StellarExpert](apps/level-2/screenshots/stellarExpertTrasactionInformation.png) |
-| 6. USDC balance after conversion | ![USDC After](apps/level-2/screenshots/usdcAfterConversion.png) |
-| 7. Cancelled transaction (user rejected) | ![Cancelled](apps/level-2/screenshots/cancelledTransaction.png) |
+| 4. Freighter transaction details | ![Freighter Details](apps/level-2/screenshots/freighterTransactionDetails.png) |
+| 5. Successful transaction | ![Tx Success](apps/level-2/screenshots/transactionSuccesfull.png) |
+| 6. Transaction on StellarExpert | ![StellarExpert](apps/level-2/screenshots/stellarExpertTrasactionInformation.png) |
+| 7. USDC balance after conversion | ![USDC After](apps/level-2/screenshots/usdcAfterConversion.png) |
+| 8. Cancelled transaction (user rejected) | ![Cancelled](apps/level-2/screenshots/cancelledTransaction.png) |
 
 ### Setup
 
