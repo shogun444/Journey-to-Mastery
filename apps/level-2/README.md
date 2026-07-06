@@ -1,4 +1,4 @@
-# Level 2 — Token Swap Interface (Blue Belt)
+# Level 2 — Token Swap Interface (Yellow Belt)
 
 A premium token swap dApp on the Stellar testnet. Multi-wallet support via **@creit.tech/stellar-wallets-kit**, DEX swaps through the Stellar orderbook using classic path payments, and high-end UI with Ethereal Glass design language.
 
@@ -32,6 +32,9 @@ Built with **Next.js 16**, **TypeScript strict**, **Tailwind CSS v4**, **@stella
 ### 5. USDC Balance After Conversion
 ![USDC After Conversion](screenshots/usdcAfterConversion.png)
 
+### 6. Cancelled Transaction (User Rejected)
+![Cancelled Transaction](screenshots/cancelledTransaction.png)
+
 Example transaction:
 [https://stellar.expert/explorer/testnet/tx/5501bfa197fa0a644b34cc0c9f55885153faed1be24030dd55963914b3197eed](https://stellar.expert/explorer/testnet/tx/5501bfa197fa0a644b34cc0c9f55885153faed1be24030dd55963914b3197eed)
 
@@ -51,7 +54,7 @@ The AMM contract at `contracts/amm/` wraps Stellar DEX path payments with event 
 ### Deployed Contract
 
 - **Network:** Stellar Testnet
-- **Contract ID:** (TBD — run `pnpm contract:deploy`)
+- **USDC SAC Contract ID:** `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA`
 
 ### Functions
 
@@ -120,3 +123,17 @@ contracts/amm/
 | Smart Contract | Rust + soroban-sdk |
 | Package manager | pnpm 9 |
 | Dev port | 3000 |
+
+## Submission Checklist
+
+- [x] Public GitHub repository: https://github.com/shogun444/Journey-to-Mastery
+- [x] README with project description and setup instructions
+- [x] Minimum 2+ meaningful commits in git history
+- [x] Screenshots included (home, wallet approval, successful tx, StellarExpert, USDC balance, cancelled tx)
+- [x] Deployed contract address in README
+- [x] Transaction hash verifiable on StellarExpert
+- [x] 3+ error types handled (wallet not found, insufficient balance, user rejection, network mismatch, slippage exceeded, tx failure)
+- [x] Multi-wallet integration (Freighter, LOBSTR, xBull, Albedo, Rabet, Hana)
+- [x] Transaction status polling (pending, success, fail)
+- [x] Error state for cancelled/user rejected transactions
+- [ ] GitHub repository link submitted before deadline

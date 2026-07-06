@@ -2,7 +2,7 @@
 
 A progressive learning path to master Stellar blockchain development — one level at a time.
 
-## Level 1: Simple Payment dApp (White Belt) ✅
+## Level 1: Simple Payment dApp (White Belt)
 
 A minimal Stellar payment dApp on the Stellar testnet. Connect your Freighter wallet, view XLM balance, and send XLM to any Stellar address.
 
@@ -53,7 +53,7 @@ Open [http://localhost:3001](http://localhost:3001).
 | Package manager | pnpm 9 |
 | Dev port | 3001 |
 
-## Level 2: Token Swap Interface (Blue Belt) ✅
+## Level 2: Token Swap Interface (Yellow Belt)
 
 A premium token swap dApp on the Stellar testnet. Multi-wallet support, DEX orderbook swaps, and high-end Ethereal Glass UI.
 
@@ -81,6 +81,7 @@ Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **@stellar/stell
 | 3. Successful transaction | ![Tx Success](apps/level-2/screenshots/transactionSuccesfull.png) |
 | 4. Transaction on StellarExpert | ![StellarExpert](apps/level-2/screenshots/stellarExpertTrasactionInformation.png) |
 | 5. USDC balance after conversion | ![USDC After](apps/level-2/screenshots/usdcAfterConversion.png) |
+| 6. Cancelled transaction (user rejected) | ![Cancelled](apps/level-2/screenshots/cancelledTransaction.png) |
 
 ### Setup
 
@@ -100,8 +101,8 @@ Deployed AMM contract on Stellar testnet wrapping DEX path payments with `SwapEx
 
 | Level | Topic | Status |
 |---|---|---|
-| **1** | Simple Payment dApp (White Belt) | ✅ Complete |
-| **2** | Token Swap Interface (Blue Belt) | ✅ Complete |
+| **1** | Simple Payment dApp (White Belt) | Complete |
+| **2** | Token Swap Interface (Yellow Belt) | Complete |
 
 ## Commands
 
