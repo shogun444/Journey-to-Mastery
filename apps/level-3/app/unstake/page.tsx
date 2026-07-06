@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "motion/react"
 import { Heading } from "@/components/ui/heading"
 import { UnstakeForm } from "@/components/stake/unstake-form"
@@ -10,12 +11,19 @@ import { useVault } from "@/hooks/useVault"
 
 export default function UnstakePage() {
   const { address } = useStellarWallet()
-  const { xlmBalance, stXlmBalance } = useBalance(address)
+  const { refresh } = useVault()
+  const [refreshKey, setRefreshKey] = useState(0)
+  const { xlmBalance, stXlmBalance } = useBalance(address, refreshKey)
   const { exchangeRate, loading: vaultLoading } = useVault()
 
   const stxlmNum = Number(stXlmBalance)
   const rate = Number(exchangeRate)
   const withdrawableXlm = stxlmNum * rate
+
+  const handleSuccess = () => {
+    setRefreshKey((k) => k + 1)
+    refresh()
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -35,7 +43,7 @@ export default function UnstakePage() {
         />
       )}
 
-      <UnstakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} />
+      <UnstakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} onSuccess={handleSuccess} />
     </div>
   )
 }

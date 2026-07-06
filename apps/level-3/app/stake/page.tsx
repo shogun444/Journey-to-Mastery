@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "motion/react"
 import { Heading } from "@/components/ui/heading"
 import { StakeForm } from "@/components/stake/stake-form"
@@ -13,8 +14,17 @@ export default function StakePage() {
   const { xlmBalance, stXlmBalance } = useBalance(address)
   const { exchangeRate, loading: vaultLoading } = useVault()
 
+  const { refresh } = useVault()
+  const [refreshKey, setRefreshKey] = useState(0)
+  useBalance(address, refreshKey)
+
   const rate = Number(exchangeRate)
   const apy = rate > 1 ? ((rate - 1) * 100).toFixed(2) : "0.00"
+
+  const handleSuccess = () => {
+    setRefreshKey((k) => k + 1)
+    refresh()
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -34,7 +44,7 @@ export default function StakePage() {
         />
       )}
 
-      <StakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} />
+      <StakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} onSuccess={handleSuccess} />
     </div>
   )
 }

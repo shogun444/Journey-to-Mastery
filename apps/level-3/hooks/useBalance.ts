@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { getHorizon } from "@/lib/stellar"
 import { getUserBalance } from "@/lib/vault"
 
-export function useBalance(address: string | null) {
+export function useBalance(address: string | null, refreshKey?: number) {
   const [xlmBalance, setXlmBalance] = useState("0")
   const [stXlmBalance, setStXlmBalance] = useState("0")
   const [loading, setLoading] = useState(false)
@@ -47,7 +47,8 @@ export function useBalance(address: string | null) {
       cancelled = true
       clearInterval(interval)
     }
-  }, [address])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, refreshKey])
 
   return { xlmBalance, stXlmBalance, loading }
 }
