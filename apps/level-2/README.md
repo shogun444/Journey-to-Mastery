@@ -20,19 +20,22 @@ Built with **Next.js 16**, **TypeScript strict**, **Tailwind CSS v4**, **@stella
 ### 1. Home Page (Wallet Connected)
 ![Home Page](screenshots/home.png)
 
-### 2. Freighter Transaction Approval
+### 2. Multi-Wallet Selection
+![Multiple Wallets](screenshots/multipleWallets.png)
+
+### 3. Freighter Transaction Approval
 ![Freighter Transaction](screenshots/freighterTransaction.png)
 
-### 3. Successful Transaction
+### 4. Successful Transaction
 ![Transaction Successful](screenshots/transactionSuccesfull.png)
 
-### 4. Transaction on StellarExpert
+### 5. Transaction on StellarExpert
 ![StellarExpert Transaction](screenshots/stellarExpertTrasactionInformation.png)
 
-### 5. USDC Balance After Conversion
+### 6. USDC Balance After Conversion
 ![USDC After Conversion](screenshots/usdcAfterConversion.png)
 
-### 6. Cancelled Transaction (User Rejected)
+### 7. Cancelled Transaction (User Rejected)
 ![Cancelled Transaction](screenshots/cancelledTransaction.png)
 
 Example transaction:
@@ -129,7 +132,7 @@ contracts/amm/
 - [x] Public GitHub repository: https://github.com/shogun444/Journey-to-Mastery
 - [x] README with project description and setup instructions
 - [x] Minimum 2+ meaningful commits in git history
-- [x] Screenshots included (home, wallet approval, successful tx, StellarExpert, USDC balance, cancelled tx)
+- [x] Screenshots included (home, multi-wallet modal, wallet approval, successful tx, StellarExpert, USDC balance, cancelled tx)
 - [x] Deployed contract address in README
 - [x] Transaction hash verifiable on StellarExpert
 - [x] 3+ error types handled (wallet not found, insufficient balance, user rejection, network mismatch, slippage exceeded, tx failure)
