@@ -31,6 +31,15 @@ export function useStellarWallet() {
         setAddress(event.payload.address ?? null)
       }
     )
+
+    try {
+      StellarWalletsKit.getAddress().then((r: { address: string }) => {
+        setAddress(r.address)
+      }).catch(() => {})
+    } catch {
+      // getAddress may not be available
+    }
+
     return unsub
   }, [])
 

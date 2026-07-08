@@ -7,8 +7,8 @@ import type { TxState } from "@/types"
 
 interface UseStakeReturn {
   state: TxState
-  deposit: (source: string, sign: (xdr: string) => Promise<string>, assets: string, onSuccess?: () => void) => Promise<void>
-  withdraw: (source: string, sign: (xdr: string) => Promise<string>, shares: string, onSuccess?: () => void) => Promise<void>
+  deposit: (source: string, sign: (xdr: string) => Promise<string>, assets: string, onSuccess?: (hash: string) => void) => Promise<void>
+  withdraw: (source: string, sign: (xdr: string) => Promise<string>, shares: string, onSuccess?: (hash: string) => void) => Promise<void>
   reset: () => void
 }
 
@@ -37,7 +37,7 @@ export function useStake(): UseStakeReturn {
     source: string,
     sign: (xdr: string) => Promise<string>,
     assets: string,
-    onSuccess?: () => void
+    onSuccess?: (hash: string) => void
   ) => {
     try {
       updateStatus("building")
@@ -48,7 +48,7 @@ export function useStake(): UseStakeReturn {
       const { hash } = await submitSorobanTransaction(signedXdr)
       saveTx("stake", assets, hash)
       await startPolling(hash)
-      if (onSuccess) onSuccess()
+      if (onSuccess) onSuccess(hash)
     } catch (err: unknown) {
       updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })
     }
@@ -58,7 +58,7 @@ export function useStake(): UseStakeReturn {
     source: string,
     sign: (xdr: string) => Promise<string>,
     shares: string,
-    onSuccess?: () => void
+    onSuccess?: (hash: string) => void
   ) => {
     try {
       updateStatus("building")
@@ -69,7 +69,7 @@ export function useStake(): UseStakeReturn {
       const { hash } = await submitSorobanTransaction(signedXdr)
       saveTx("unstake", shares, hash)
       await startPolling(hash)
-      if (onSuccess) onSuccess()
+      if (onSuccess) onSuccess(hash)
     } catch (err: unknown) {
       updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })
     }

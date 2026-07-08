@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { getHorizon } from "@/lib/stellar"
 import { getUserBalance } from "@/lib/vault"
 
@@ -8,7 +8,6 @@ export function useBalance(address: string | null, refreshKey?: number, eventCou
   const [xlmBalance, setXlmBalance] = useState("0")
   const [stXlmBalance, setStXlmBalance] = useState("0")
   const [loading, setLoading] = useState(false)
-  const initialised = useRef(false)
 
   const refresh = useCallback(async () => {
     if (!address) {
@@ -19,61 +18,32 @@ export function useBalance(address: string | null, refreshKey?: number, eventCou
 
     setLoading(true)
 
-    try {
-      const account = await getHorizon().loadAccount(address)
-      const native = account.balances.find(
-        (b: { asset_type: string; balance: string }) => b.asset_type === "native"
-      )
-      setXlmBalance(native?.balance ?? "0")
-    } catch {
-      setXlmBalance("0")
-    }
+    const [horizonResult, stxlm] = await Promise.all([
+      getHorizon()
+        .loadAccount(address)
+        .then((account) => {
+          const native = account.balances.find(
+            (b: { asset_type: string; balance: string }) => b.asset_type === "native"
+          )
+          return native?.balance ?? "0"
+        })
+        .catch(() => "0"),
+      getUserBalance(address).then((b) => b ?? "0"),
+    ])
 
-    const stxlm = await getUserBalance(address)
-    setStXlmBalance(stxlm ?? "0")
-
+    setXlmBalance(horizonResult)
+    setStXlmBalance(stxlm)
     setLoading(false)
   }, [address])
 
   useEffect(() => {
-    let cancelled = false
-
-    async function fetchBalances() {
-      if (!address) {
-        if (!initialised.current) {
-          setXlmBalance("0")
-          setStXlmBalance("0")
-          initialised.current = true
-        }
-        return
-      }
-
-      setLoading(true)
-
-      try {
-        const account = await getHorizon().loadAccount(address)
-        const native = account.balances.find(
-          (b: { asset_type: string; balance: string }) => b.asset_type === "native"
-        )
-        if (!cancelled) setXlmBalance(native?.balance ?? "0")
-      } catch {
-        if (!cancelled) setXlmBalance("0")
-      }
-
-      const stxlm = await getUserBalance(address)
-      if (!cancelled) setStXlmBalance(stxlm ?? "0")
-
-      if (!cancelled) setLoading(false)
-    }
-
-    const timer = setTimeout(fetchBalances, 0)
-    const interval = setInterval(fetchBalances, 30000)
+    const timer = setTimeout(refresh, 0)
+    const interval = setInterval(refresh, 30000)
     return () => {
-      cancelled = true
       clearTimeout(timer)
       clearInterval(interval)
     }
-  }, [address, refreshKey, eventCount])
+  }, [refresh, refreshKey, eventCount])
 
   return { xlmBalance, stXlmBalance, loading, refresh }
 }
