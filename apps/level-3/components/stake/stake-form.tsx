@@ -8,10 +8,11 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Heading } from "@/components/ui/heading"
 import { PreviewDisplay } from "./preview-display"
+import { TransactionSuccessModal, type SuccessDetails } from "./transaction-success-modal"
 import { useStake } from "@/hooks/useStake"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
-import { STELLAR_EXPERT_URL } from "@/lib/stellar"
-import { ArrowDown } from "@phosphor-icons/react"
+import { useLiveMarket } from "@/hooks/useLiveMarket"
+import { ArrowDown, TrendUp, TrendDown } from "@phosphor-icons/react"
 import type { TxState } from "@/types"
 
 interface StakeFormProps {
@@ -26,25 +27,53 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
   const { state, deposit, reset } = useStake()
   const [amount, setAmount] = useState("")
   const [optimisticAmount, setOptimisticAmount] = useState(0)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [successDetails, setSuccessDetails] = useState<SuccessDetails | null>(null)
 
+  const vaultRate = Number.parseFloat(exchangeRate) || 1
+  const { currentRate, lastChange } = useLiveMarket({ baseRate: vaultRate })
+
+  const liveRate = currentRate || vaultRate
   const xlmNum = Number.parseFloat(xlmBalance)
   const amountNum = Number.parseFloat(amount) || 0
-  const rate = Number.parseFloat(exchangeRate) || 1
-  const previewShares = amountNum > 0 && rate > 0 ? (amountNum / rate).toFixed(7) : "0"
+  const previewShares = amountNum > 0 && liveRate > 0 ? (amountNum / liveRate).toFixed(7) : "0"
 
   const isPending = state.status === "submitting" || state.status === "pending"
-
   const effectiveXlm = Math.max(0, xlmNum - optimisticAmount)
 
   const handleMax = () => setAmount(String(effectiveXlm))
+
   const handleDeposit = async () => {
     if (!address || !amount) return
+    const staked = amountNum
+    const received = Number(previewShares)
+    const rateAtSubmit = liveRate
     setOptimisticAmount(amountNum)
     try {
-      await deposit(address, sign, (Number.parseFloat(amount) * 1e7).toFixed(0), onSuccess)
+      await deposit(address, sign, (staked * 1e7).toFixed(0), (hash: string) => {
+        setSuccessDetails({
+          type: "stake",
+          inputAmount: staked.toFixed(2),
+          inputAsset: "XLM",
+          outputAmount: received.toFixed(7),
+          outputAsset: "stXLM",
+          rateLabel: `1 XLM ≈ ${(1 / rateAtSubmit).toFixed(7)} stXLM`,
+          slippageTolerance: "0.50%",
+          networkFee: "0.0000100 XLM",
+          hash,
+        })
+        setShowSuccess(true)
+        if (onSuccess) onSuccess()
+      })
     } finally {
       setOptimisticAmount(0)
     }
+  }
+
+  const closeModal = () => {
+    setShowSuccess(false)
+    reset()
+    setAmount("")
   }
 
   const tx = state as TxState
@@ -54,7 +83,14 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
       <Card className="p-6 max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-5">
           <Heading as="h2">Stake XLM</Heading>
-          <Badge variant="default">1 XLM ≈ {(1 / rate).toFixed(7)} stXLM</Badge>
+          <Badge variant="default" className="flex items-center gap-1">
+            1 XLM ≈ {(1 / liveRate).toFixed(7)} stXLM
+            {lastChange >= 0 ? (
+              <TrendUp size={12} className="text-emerald-400" />
+            ) : (
+              <TrendDown size={12} className="text-red-400" />
+            )}
+          </Badge>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -90,10 +126,7 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
           </div>
 
           <div className="flex justify-center">
-            <motion.div
-              animate={{ y: [0, 3, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
+            <motion.div animate={{ y: [0, 3, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
               <ArrowDown size={20} className="text-zinc-500" />
             </motion.div>
           </div>
@@ -101,12 +134,12 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
           <PreviewDisplay
             label="You receive"
             value={`${previewShares} stXLM`}
-            tooltip="Estimated stXLM to receive. Final amount may vary."
+            tooltip="Estimated stXLM to receive at the current market rate. Final amount may vary."
           />
 
           {amountNum > 0 && xlmNum > 0 && (
             <div className="flex justify-between text-xs text-zinc-500 px-1">
-              <span>Exchange rate: 1 XLM ≈ {(1 / rate).toFixed(7)} stXLM</span>
+              <span>Live rate: 1 XLM ≈ {(1 / liveRate).toFixed(7)} stXLM</span>
               <span>Fee: 0%</span>
             </div>
           )}
@@ -122,27 +155,6 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
             {!address ? "Connect Wallet" : isPending ? "Confirming..." : "Stake XLM"}
           </Button>
 
-          {tx.status === "success" && tx.hash && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-emerald-400 text-center"
-            >
-              Staked successfully!{" "}
-              <a
-                href={`${STELLAR_EXPERT_URL}/tx/${tx.hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                View on StellarExpert
-              </a>
-              <button onClick={reset} className="ml-2 text-zinc-400 hover:text-zinc-200 underline">
-                Reset
-              </button>
-            </motion.p>
-          )}
-
           {tx.status === "failed" && (
             <motion.p
               initial={{ opacity: 0 }}
@@ -154,6 +166,8 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
           )}
         </div>
       </Card>
+
+      <TransactionSuccessModal open={showSuccess} onClose={closeModal} details={successDetails} />
     </motion.div>
   )
 }
