@@ -9,6 +9,7 @@ import { useBalance } from "@/hooks/useBalance"
 import { useVault } from "@/hooks/useVault"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
 import { useSorobanEvents } from "@/hooks/useSorobanEvents"
+import { useLiveMarket } from "@/hooks/useLiveMarket"
 import {
   ArrowRight,
   Coins,
@@ -28,7 +29,9 @@ export default function DashboardPage() {
 
   const xlmNum = Number(xlmBalance)
   const stxlmNum = Number(stXlmBalance)
-  const rate = Number(exchangeRate)
+  const contractRate = Number(exchangeRate)
+  const { currentRate } = useLiveMarket({ baseRate: contractRate || 1 })
+  const rate = currentRate || contractRate || 1
   const stakedXlmValue = stxlmNum * rate
   const profitLoss = stakedXlmValue - stxlmNum
   const apy = rate > 1 ? ((rate - 1) * 100).toFixed(2) : "0.00"

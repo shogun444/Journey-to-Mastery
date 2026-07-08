@@ -9,6 +9,7 @@ import { useStellarWallet } from "@/hooks/useStellarWallet"
 import { useBalance } from "@/hooks/useBalance"
 import { useVault } from "@/hooks/useVault"
 import { useSorobanEvents } from "@/hooks/useSorobanEvents"
+import { useLiveMarket } from "@/hooks/useLiveMarket"
 
 export default function StakePage() {
   const { address } = useStellarWallet()
@@ -17,7 +18,9 @@ export default function StakePage() {
   const { xlmBalance, stXlmBalance } = useBalance(address, refreshKey, eventCount)
   const { exchangeRate, loading: vaultLoading, refresh } = useVault(address, eventCount)
 
-  const rate = Number(exchangeRate)
+  const contractRate = Number(exchangeRate)
+  const { currentRate } = useLiveMarket({ baseRate: contractRate || 1 })
+  const rate = currentRate || contractRate || 1
   const apy = rate > 1 ? ((rate - 1) * 100).toFixed(2) : "0.00"
 
   const handleSuccess = () => {
