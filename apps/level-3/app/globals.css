@@ -54,3 +54,35 @@ input[type="number"] {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+
+.recharts-surface,
+.recharts-responsive-container,
+.recharts-wrapper,
+.recharts-legend-wrapper,
+.recharts-tooltip-wrapper,
+.recharts-cartesian-grid,
+.recharts-cartesian-grid-bg,
+.recharts-default-tooltip,
+.recharts-text,
+.recharts-layer {
+  background: transparent !important;
+}
+
+.recharts-tooltip-wrapper:focus,
+.recharts-tooltip-wrapper:active,
+.recharts-tooltip-wrapper:hover {
+  background: transparent !important;
+}
+
+.recharts-wrapper svg {
+  background: transparent !important;
+}
+
+.recharts-wrapper svg rect {
+  fill: transparent !important;
+}
+
+.recharts-bar-rectangle:hover {
+  opacity: 0.8;
+  fill: currentColor !important;
+}

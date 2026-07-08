@@ -22,24 +22,21 @@ const typeConfig = {
   unstake: { label: "Unstake", color: "text-blue-400" as const, badge: "default" as const },
 }
 
+function loadTxs(): Tx[] {
+  try {
+    return JSON.parse(localStorage.getItem("stxlm_txs") || "[]")
+  } catch {
+    return []
+  }
+}
+
 export default function TransactionsPage() {
-  const [txs, setTxs] = useState<Tx[]>([])
+  const [txs, setTxs] = useState<Tx[]>(loadTxs)
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("stxlm_txs") || "[]")
-      setTxs(stored)
-    } catch {
-      setTxs([])
-    }
-
     const interval = setInterval(() => {
-      try {
-        const stored = JSON.parse(localStorage.getItem("stxlm_txs") || "[]")
-        setTxs(stored)
-      } catch {
-        // silent
-      }
+      const stored = loadTxs()
+      setTxs(stored)
     }, 5000)
 
     return () => clearInterval(interval)
@@ -66,20 +63,25 @@ export default function TransactionsPage() {
                     href={`${STELLAR_EXPERT_URL}/tx/${tx.hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between px-5 py-4 hover:bg-zinc-900 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-5 py-4 hover:bg-zinc-900 transition-colors gap-2 sm:gap-0"
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between sm:justify-start sm:gap-4">
                       <div>
                         <p className={`text-sm font-medium ${cfg.color}`}>{cfg.label}</p>
                         <p className="text-xs text-zinc-500 mt-0.5">{timeAgo}</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-mono text-zinc-200">
+                      <span className="text-sm font-mono text-zinc-200 sm:hidden text-right">
                         {tx.amount} {tx.asset}
                       </span>
-                      <Badge variant={cfg.badge}>{tx.status}</Badge>
-                      <span className="text-xs font-mono text-zinc-500 w-24 text-right">{shortHash}</span>
+                    </div>
+                    <div className="flex items-center justify-between sm:gap-4">
+                      <span className="text-sm font-mono text-zinc-200 hidden sm:inline">
+                        {tx.amount} {tx.asset}
+                      </span>
+                      <div className="flex items-center gap-2 sm:gap-4">
+                        <Badge variant={cfg.badge}>{tx.status}</Badge>
+                        <span className="text-xs font-mono text-zinc-500 text-right">{shortHash}</span>
+                      </div>
                     </div>
                   </a>
                 )

@@ -65,6 +65,13 @@ See `docs/deployment.md`.
 - [Roadmap](docs/roadmap.md)
 - [Deployment](docs/deployment.md)
 
+## Confirmed Transactions
+
+| Type | Hash | Explorer |
+|------|------|----------|
+| Deposit (12 XLM → 12 stXLM) | `1f98ec47a42ad38c77667225f58b0fd760fb0c77a7d3feecc608cd6880e560d5` | [View](https://stellar.expert/explorer/testnet/tx/1f98ec47a42ad38c77667225f58b0fd760fb0c77a7d3feecc608cd6880e560d5) |
+| Withdraw (2 stXLM → 2 XLM) | `32e96e380e342d9d801dd246d4cf8562cae0faf869f8fff05b9e0c73c341b831` | [View](https://stellar.expert/explorer/testnet/tx/32e96e380e342d9d801dd246d4cf8562cae0faf869f8fff05b9e0c73c341b831) |
+
 ## Network
 
 Testnet only. Yield is simulated via `simulate_yield()` because testnet XLM has no real value. The vault is designed with a yield adapter interface for future production strategies (Blend, Soroswap, etc.).
