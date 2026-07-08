@@ -151,7 +151,8 @@ impl Vault {
         Self::_mint_st_xlm(&env, &sender, shares);
 
         if fee > 0 {
-            let _treasury: Address = env.storage().instance().get(&DataKey::Treasury).unwrap();
+            let treasury: Address = env.storage().instance().get(&DataKey::Treasury).unwrap();
+            Self::_transfer_xlm_out(&env, &treasury, fee);
         }
 
         Self::_emit_exchange_rate(&env);
