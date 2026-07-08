@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useBalance } from "@/hooks/useBalance"
 import { useVault } from "@/hooks/useVault"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
+import { useSorobanEvents } from "@/hooks/useSorobanEvents"
 import {
   ArrowRight,
   Coins,
@@ -15,13 +16,15 @@ import {
   Wallet,
   TrendUp,
   Clock,
+  Info,
 } from "@phosphor-icons/react"
 import Link from "next/link"
 
 export default function DashboardPage() {
   const { address } = useStellarWallet()
-  const { xlmBalance, stXlmBalance } = useBalance(address)
-  const { exchangeRate, loading: vaultLoading } = useVault()
+  const { eventCount } = useSorobanEvents(address)
+  const { xlmBalance, stXlmBalance } = useBalance(address, undefined, eventCount)
+  const { exchangeRate, loading: vaultLoading } = useVault(address, eventCount)
 
   const xlmNum = Number(xlmBalance)
   const stxlmNum = Number(stXlmBalance)
@@ -150,6 +153,19 @@ export default function DashboardPage() {
           </Card>
         </motion.div>
       )}
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.09 }}
+        className="flex items-start gap-3 rounded-lg border border-amber-800/30 bg-amber-950/20 p-3 md:p-4"
+      >
+        <Info size={16} className="mt-0.5 shrink-0 text-amber-400" />
+        <p className="text-xs md:text-sm text-amber-300/80 leading-relaxed">
+          <strong className="text-amber-200">stXLM is a Soroban token</strong> &mdash; Freighter&apos;s built-in swap only supports classic
+          assets. Use <strong>Stake</strong> to convert XLM → stXLM and <strong>Unstake</strong> to convert stXLM → XLM.
+        </p>
+      </motion.div>
 
       {address ? (
         <motion.div

@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { getVaultState as fetchVaultState, getExchangeRate as fetchExchangeRate } from "@/lib/vault"
+import { useState, useEffect, useCallback } from "react"
+import { getVaultState as fetchVaultState, getExchangeRate as fetchExchangeRate, isValidStellarAddress } from "@/lib/vault"
 import type { VaultState } from "@/types"
 
-export function useVault() {
+export function useVault(address?: string | null, eventCount?: number) {
   const [vaultState, setVaultState] = useState<VaultState>({
     totalAssets: "0",
     totalSupply: "0",
@@ -16,14 +16,26 @@ export function useVault() {
   })
   const [exchangeRate, setExchangeRate] = useState("1.0000")
   const [loading, setLoading] = useState(false)
-  const initialised = useRef(false)
 
   const refresh = useCallback(async () => {
+    if (!address || !isValidStellarAddress(address)) {
+      setVaultState({
+        totalAssets: "0",
+        totalSupply: "0",
+        exchangeRateNumer: "1",
+        exchangeRateDenom: "1",
+        paused: false,
+        depositFeeBps: 0,
+        withdrawFeeBps: 0,
+      })
+      setExchangeRate("1.0000")
+      return
+    }
     setLoading(true)
     try {
       const [state, rate] = await Promise.all([
-        fetchVaultState(),
-        fetchExchangeRate(),
+        fetchVaultState(address),
+        fetchExchangeRate(address),
       ])
       setVaultState({
         totalAssets: state.totalAssets,
@@ -39,16 +51,16 @@ export function useVault() {
       // keep previous state
     }
     setLoading(false)
-  }, [])
+  }, [address])
 
   useEffect(() => {
-    if (!initialised.current) {
-      initialised.current = true
-      refresh()
-    }
+    const timer = setTimeout(refresh, 0)
     const interval = setInterval(refresh, 30000)
-    return () => clearInterval(interval)
-  }, [refresh])
+    return () => {
+      clearTimeout(timer)
+      clearInterval(interval)
+    }
+  }, [refresh, eventCount])
 
   return { vaultState, exchangeRate, loading, refresh }
 }

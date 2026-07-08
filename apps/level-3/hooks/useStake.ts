@@ -7,8 +7,8 @@ import type { TxState } from "@/types"
 
 interface UseStakeReturn {
   state: TxState
-  deposit: (source: string, sign: (xdr: string) => Promise<string>, assets: string) => Promise<void>
-  withdraw: (source: string, sign: (xdr: string) => Promise<string>, shares: string) => Promise<void>
+  deposit: (source: string, sign: (xdr: string) => Promise<string>, assets: string, onSuccess?: () => void) => Promise<void>
+  withdraw: (source: string, sign: (xdr: string) => Promise<string>, shares: string, onSuccess?: () => void) => Promise<void>
   reset: () => void
 }
 
@@ -36,7 +36,8 @@ export function useStake(): UseStakeReturn {
   const deposit = async (
     source: string,
     sign: (xdr: string) => Promise<string>,
-    assets: string
+    assets: string,
+    onSuccess?: () => void
   ) => {
     try {
       updateStatus("building")
@@ -47,6 +48,7 @@ export function useStake(): UseStakeReturn {
       const { hash } = await submitSorobanTransaction(signedXdr)
       saveTx("stake", assets, hash)
       await startPolling(hash)
+      if (onSuccess) onSuccess()
     } catch (err: unknown) {
       updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })
     }
@@ -55,7 +57,8 @@ export function useStake(): UseStakeReturn {
   const withdraw = async (
     source: string,
     sign: (xdr: string) => Promise<string>,
-    shares: string
+    shares: string,
+    onSuccess?: () => void
   ) => {
     try {
       updateStatus("building")
@@ -66,6 +69,7 @@ export function useStake(): UseStakeReturn {
       const { hash } = await submitSorobanTransaction(signedXdr)
       saveTx("unstake", shares, hash)
       await startPolling(hash)
+      if (onSuccess) onSuccess()
     } catch (err: unknown) {
       updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })
     }

@@ -8,13 +8,14 @@ import { StakeStats } from "@/components/stake/stake-stats"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
 import { useBalance } from "@/hooks/useBalance"
 import { useVault } from "@/hooks/useVault"
+import { useSorobanEvents } from "@/hooks/useSorobanEvents"
 
 export default function UnstakePage() {
   const { address } = useStellarWallet()
-  const { refresh } = useVault()
   const [refreshKey, setRefreshKey] = useState(0)
-  const { xlmBalance, stXlmBalance } = useBalance(address, refreshKey)
-  const { exchangeRate, loading: vaultLoading } = useVault()
+  const { eventCount } = useSorobanEvents(address)
+  const { xlmBalance, stXlmBalance } = useBalance(address, refreshKey, eventCount)
+  const { exchangeRate, loading: vaultLoading, refresh } = useVault(address, eventCount)
 
   const stxlmNum = Number(stXlmBalance)
   const rate = Number(exchangeRate)
@@ -43,7 +44,7 @@ export default function UnstakePage() {
         />
       )}
 
-      <UnstakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} onSuccess={handleSuccess} />
+      <UnstakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} stXlmBalance={stXlmBalance} onSuccess={handleSuccess} />
     </div>
   )
 }

@@ -10,7 +10,6 @@ import { Heading } from "@/components/ui/heading"
 import { PreviewDisplay } from "./preview-display"
 import { useStake } from "@/hooks/useStake"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
-import { useBalance } from "@/hooks/useBalance"
 import { STELLAR_EXPERT_URL } from "@/lib/stellar"
 import { ArrowDown } from "@phosphor-icons/react"
 import type { TxState } from "@/types"
@@ -18,24 +17,34 @@ import type { TxState } from "@/types"
 interface UnstakeFormProps {
   exchangeRate: string
   vaultLoading: boolean
+  stXlmBalance: string
   onSuccess?: () => void
 }
 
-export function UnstakeForm({ exchangeRate, vaultLoading, onSuccess }: UnstakeFormProps) {
+export function UnstakeForm({ exchangeRate, vaultLoading, stXlmBalance, onSuccess }: UnstakeFormProps) {
   const { address, sign } = useStellarWallet()
-  const { stXlmBalance } = useBalance(address)
   const { state, withdraw, reset } = useStake()
   const [amount, setAmount] = useState("")
+  const [optimisticAmount, setOptimisticAmount] = useState(0)
 
   const amountNum = Number.parseFloat(amount) || 0
   const rate = Number.parseFloat(exchangeRate) || 1
   const previewXlm = amountNum > 0 ? (amountNum * rate).toFixed(7) : "0"
+  const stxlmNum = Number.parseFloat(stXlmBalance)
 
-  const handleMax = () => setAmount(stXlmBalance)
+  const isPending = state.status === "submitting" || state.status === "pending"
+
+  const effectiveStXlm = Math.max(0, stxlmNum - optimisticAmount)
+
+  const handleMax = () => setAmount(String(effectiveStXlm))
   const handleWithdraw = async () => {
     if (!address || !amount) return
-    await withdraw(address, sign, (amountNum * 1e7).toFixed(0))
-    if (onSuccess) onSuccess()
+    setOptimisticAmount(amountNum)
+    try {
+      await withdraw(address, sign, (amountNum * 1e7).toFixed(0), onSuccess)
+    } finally {
+      setOptimisticAmount(0)
+    }
   }
 
   const tx = state as TxState
@@ -55,15 +64,26 @@ export function UnstakeForm({ exchangeRate, vaultLoading, onSuccess }: UnstakeFo
             placeholder="0.0"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            disabled={!address || tx.status === "submitting" || tx.status === "pending"}
+            disabled={!address || isPending}
           />
 
           <div className="flex items-center justify-between text-xs">
-            <span className="text-zinc-500">Balance: {stXlmBalance} stXLM</span>
+            <span className="text-zinc-500">
+              Balance:{" "}
+              {optimisticAmount > 0 ? (
+                <>
+                  <span className="text-zinc-400">{effectiveStXlm.toFixed(7)}</span>{" "}
+                  <span className="text-zinc-600">({stxlmNum.toFixed(7)} - {optimisticAmount.toFixed(2)})</span>
+                </>
+              ) : (
+                <span>{stXlmBalance} stXLM</span>
+              )}
+              {isPending && <span className="text-amber-400 ml-2">pending...</span>}
+            </span>
             <button
               onClick={handleMax}
               className="text-blue-400 hover:text-blue-300 transition-colors"
-              disabled={!address}
+              disabled={!address || isPending}
             >
               Max
             </button>
@@ -95,11 +115,11 @@ export function UnstakeForm({ exchangeRate, vaultLoading, onSuccess }: UnstakeFo
             variant="success"
             size="lg"
             className="w-full mt-2"
-            disabled={!address || !amount || amountNum <= 0 || vaultLoading}
-            loading={tx.status === "submitting" || tx.status === "pending"}
+            disabled={!address || !amount || amountNum <= 0 || amountNum > effectiveStXlm || vaultLoading}
+            loading={isPending}
             onClick={handleWithdraw}
           >
-            {!address ? "Connect Wallet" : tx.status === "pending" ? "Confirming..." : "Unstake stXLM"}
+            {!address ? "Connect Wallet" : isPending ? "Confirming..." : "Unstake stXLM"}
           </Button>
 
           {tx.status === "success" && tx.hash && (

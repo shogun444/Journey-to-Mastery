@@ -8,15 +8,14 @@ import { StakeStats } from "@/components/stake/stake-stats"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
 import { useBalance } from "@/hooks/useBalance"
 import { useVault } from "@/hooks/useVault"
+import { useSorobanEvents } from "@/hooks/useSorobanEvents"
 
 export default function StakePage() {
   const { address } = useStellarWallet()
-  const { xlmBalance, stXlmBalance } = useBalance(address)
-  const { exchangeRate, loading: vaultLoading } = useVault()
-
-  const { refresh } = useVault()
   const [refreshKey, setRefreshKey] = useState(0)
-  useBalance(address, refreshKey)
+  const { eventCount } = useSorobanEvents(address)
+  const { xlmBalance, stXlmBalance } = useBalance(address, refreshKey, eventCount)
+  const { exchangeRate, loading: vaultLoading, refresh } = useVault(address, eventCount)
 
   const rate = Number(exchangeRate)
   const apy = rate > 1 ? ((rate - 1) * 100).toFixed(2) : "0.00"
@@ -44,7 +43,7 @@ export default function StakePage() {
         />
       )}
 
-      <StakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} onSuccess={handleSuccess} />
+      <StakeForm exchangeRate={exchangeRate} vaultLoading={vaultLoading} xlmBalance={xlmBalance} onSuccess={handleSuccess} />
     </div>
   )
 }

@@ -5,14 +5,19 @@ function vaultContract() {
   return new StellarSdk.Contract(VAULT_CONTRACT_ID)
 }
 
-function defaultSourceAccount() {
-  return new StellarSdk.Account(VAULT_CONTRACT_ID, "0")
+function simSource(address: string) {
+  return new StellarSdk.Account(address, "0")
 }
 
-async function simulateCall(fn: string, ...args: StellarSdk.xdr.ScVal[]): Promise<string | null> {
+export function isValidStellarAddress(addr: string): boolean {
+  return /^G[A-Z2-7]{55}$/.test(addr)
+}
+
+async function simulateCall(fn: string, source: string, ...args: StellarSdk.xdr.ScVal[]): Promise<string | null> {
+  if (!isValidStellarAddress(source)) return null
   try {
     const sim = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
+      new StellarSdk.TransactionBuilder(simSource(source), {
         fee: StellarSdk.BASE_FEE,
         networkPassphrase: config.networkPassphrase,
       })
@@ -29,19 +34,22 @@ async function simulateCall(fn: string, ...args: StellarSdk.xdr.ScVal[]): Promis
   return null
 }
 
-export async function getVaultState(): Promise<{
+export async function getVaultState(source: string): Promise<{
   totalAssets: string
   totalSupply: string
   paused: boolean
   depositFeeBps: number
   withdrawFeeBps: number
 }> {
+  if (!isValidStellarAddress(source)) {
+    return { totalAssets: "0", totalSupply: "0", paused: false, depositFeeBps: 0, withdrawFeeBps: 0 }
+  }
   const [totalAssets, totalSupply, paused, depositFeeBps, withdrawFeeBps] = await Promise.all([
-    simulateCall("total_assets"),
-    simulateCall("total_supply"),
-    simulateCall("paused"),
-    simulateCall("deposit_fee_bps"),
-    simulateCall("withdraw_fee_bps"),
+    simulateCall("total_assets", source),
+    simulateCall("total_supply", source),
+    simulateCall("paused", source),
+    simulateCall("deposit_fee_bps", source),
+    simulateCall("withdraw_fee_bps", source),
   ])
   return {
     totalAssets: totalAssets ?? "0",
@@ -52,15 +60,25 @@ export async function getVaultState(): Promise<{
   }
 }
 
-export async function getExchangeRate(): Promise<string> {
-  const result = await simulateCall("exchange_rate")
-  if (!result) return "1.0000"
+export async function getExchangeRate(source: string): Promise<string> {
+  if (!isValidStellarAddress(source)) return "1.0000"
   try {
-    const parsed = JSON.parse(result)
-    if (Array.isArray(parsed) && parsed.length === 2) {
-      const num = Number(parsed[0])
-      const den = Number(parsed[1])
-      if (den > 0) return (num / den).toFixed(7)
+    const sim = await getRpc().simulateTransaction(
+      new StellarSdk.TransactionBuilder(simSource(source), {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: config.networkPassphrase,
+      })
+        .addOperation(vaultContract().call("exchange_rate"))
+        .setTimeout(30)
+        .build()
+    )
+    if (StellarSdk.rpc.Api.isSimulationSuccess(sim) && sim.result) {
+      const native = StellarSdk.scValToNative(sim.result.retval)
+      if (Array.isArray(native) && native.length === 2) {
+        const num = Number(native[0])
+        const den = Number(native[1])
+        if (den > 0) return (num / den).toFixed(7)
+      }
     }
   } catch {
     // silent
@@ -69,9 +87,10 @@ export async function getExchangeRate(): Promise<string> {
 }
 
 export async function getUserBalance(address: string): Promise<string | null> {
+  if (!isValidStellarAddress(address)) return null
   try {
     const sim = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
+      new StellarSdk.TransactionBuilder(simSource(address), {
         fee: StellarSdk.BASE_FEE,
         networkPassphrase: config.networkPassphrase,
       })
@@ -94,10 +113,11 @@ export async function getUserBalance(address: string): Promise<string | null> {
   return null
 }
 
-export async function previewDeposit(assets: string): Promise<string> {
+export async function previewDeposit(assets: string, source: string): Promise<string> {
+  if (!isValidStellarAddress(source)) return "0"
   try {
     const simulation = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
+      new StellarSdk.TransactionBuilder(simSource(source), {
         fee: StellarSdk.BASE_FEE,
         networkPassphrase: config.networkPassphrase,
       })
@@ -116,10 +136,11 @@ export async function previewDeposit(assets: string): Promise<string> {
   }
 }
 
-export async function previewWithdraw(shares: string): Promise<string> {
+export async function previewWithdraw(shares: string, source: string): Promise<string> {
+  if (!isValidStellarAddress(source)) return "0"
   try {
     const simulation = await getRpc().simulateTransaction(
-      new StellarSdk.TransactionBuilder(defaultSourceAccount(), {
+      new StellarSdk.TransactionBuilder(simSource(source), {
         fee: StellarSdk.BASE_FEE,
         networkPassphrase: config.networkPassphrase,
       })

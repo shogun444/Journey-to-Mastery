@@ -1,14 +1,39 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { getHorizon } from "@/lib/stellar"
 import { getUserBalance } from "@/lib/vault"
 
-export function useBalance(address: string | null, refreshKey?: number) {
+export function useBalance(address: string | null, refreshKey?: number, eventCount?: number) {
   const [xlmBalance, setXlmBalance] = useState("0")
   const [stXlmBalance, setStXlmBalance] = useState("0")
   const [loading, setLoading] = useState(false)
   const initialised = useRef(false)
+
+  const refresh = useCallback(async () => {
+    if (!address) {
+      setXlmBalance("0")
+      setStXlmBalance("0")
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const account = await getHorizon().loadAccount(address)
+      const native = account.balances.find(
+        (b: { asset_type: string; balance: string }) => b.asset_type === "native"
+      )
+      setXlmBalance(native?.balance ?? "0")
+    } catch {
+      setXlmBalance("0")
+    }
+
+    const stxlm = await getUserBalance(address)
+    setStXlmBalance(stxlm ?? "0")
+
+    setLoading(false)
+  }, [address])
 
   useEffect(() => {
     let cancelled = false
@@ -41,14 +66,14 @@ export function useBalance(address: string | null, refreshKey?: number) {
       if (!cancelled) setLoading(false)
     }
 
-    fetchBalances()
+    const timer = setTimeout(fetchBalances, 0)
     const interval = setInterval(fetchBalances, 30000)
     return () => {
       cancelled = true
+      clearTimeout(timer)
       clearInterval(interval)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address, refreshKey])
+  }, [address, refreshKey, eventCount])
 
-  return { xlmBalance, stXlmBalance, loading }
+  return { xlmBalance, stXlmBalance, loading, refresh }
 }
