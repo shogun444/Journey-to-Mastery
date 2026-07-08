@@ -4,7 +4,7 @@ import { motion } from "motion/react"
 import { Card } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts"
-import type { ActivityPoint } from "@/hooks/useAnalytics"
+import type { ActivityPoint } from "@/lib/analytics"
 
 interface ActivityChartProps {
   data: ActivityPoint[]
@@ -68,7 +68,11 @@ export function ActivityChart({ data, loading }: ActivityChartProps) {
                   width={48}
                   tickFormatter={(v: number) => v.toFixed(1)}
                 />
-                <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: "transparent", border: "none", outline: "none" }} />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: "transparent" }}
+                  wrapperStyle={{ background: "transparent", border: "none", outline: "none" }}
+                />
                 <Legend
                   wrapperStyle={{ fontSize: 11, color: "#a1a1aa" }}
                   iconType="circle"

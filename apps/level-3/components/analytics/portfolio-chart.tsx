@@ -4,7 +4,7 @@ import { motion } from "motion/react"
 import { Card } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
-import type { ChartPoint } from "@/hooks/useAnalytics"
+import type { ChartPoint } from "@/lib/analytics"
 
 interface PortfolioChartProps {
   data: ChartPoint[]
@@ -19,7 +19,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 shadow-xl">
       <p className="text-xs text-zinc-400">{label}</p>
       <p className="text-sm font-mono font-medium text-emerald-400">
-        {payload[0].value.toFixed(2)} stXLM
+        {payload[0].value.toFixed(2)} XLM
       </p>
     </div>
   )

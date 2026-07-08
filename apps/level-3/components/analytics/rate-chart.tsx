@@ -4,7 +4,7 @@ import { motion } from "motion/react"
 import { Card } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
-import type { ChartPoint } from "@/hooks/useAnalytics"
+import type { ChartPoint } from "@/lib/analytics"
 
 interface RateChartProps {
   data: ChartPoint[]

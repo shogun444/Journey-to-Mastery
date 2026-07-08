@@ -10,6 +10,7 @@ import { AnalyticsStats } from "@/components/analytics/analytics-stats"
 import { PortfolioChart } from "@/components/analytics/portfolio-chart"
 import { ActivityChart } from "@/components/analytics/activity-chart"
 import { RateChart } from "@/components/analytics/rate-chart"
+import { LiveMarketCard } from "@/components/analytics/live-market-card"
 
 export default function AnalyticsPage() {
   const { address } = useStellarWallet()
@@ -25,6 +26,14 @@ export default function AnalyticsPage() {
     loading,
     stxlmBalance,
     exchangeRate,
+    tvl,
+    protocolTotalSupply,
+    totalStakers,
+    protocolRevenue,
+    todaysYield,
+    currentRate,
+    lastChange,
+    livePoints,
   } = useAnalytics(address, eventCount)
 
   return (
@@ -44,6 +53,18 @@ export default function AnalyticsPage() {
         tradeCount={tradeCount}
         apy={apy}
         loading={loading}
+        tvl={tvl}
+        totalSupply={protocolTotalSupply}
+        totalStakers={totalStakers}
+        protocolRevenue={protocolRevenue}
+        todaysYield={todaysYield}
+      />
+
+      <LiveMarketCard
+        baseRate={Number(exchangeRate) || 1}
+        livePoints={livePoints}
+        currentRate={currentRate}
+        lastChange={lastChange}
       />
 
       <PortfolioChart
