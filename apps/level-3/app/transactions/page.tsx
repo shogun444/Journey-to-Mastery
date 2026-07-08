@@ -5,24 +5,28 @@ import { motion } from "motion/react"
 import { Card } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Badge } from "@/components/ui/badge"
-import { STELLAR_EXPERT_URL } from "@/lib/stellar"
+import { useStellarWallet } from "@/hooks/useStellarWallet"
+import { useSorobanEvents } from "@/hooks/useSorobanEvents"
+import { getHorizon, STELLAR_EXPERT_URL } from "@/lib/stellar"
 
 interface Tx {
   id: string
-  type: "stake" | "unstake"
+  type: "stake" | "unstake" | "yield" | "fee"
   amount: string
   asset: string
   timestamp: string
   hash: string
-  status: "success"
+  status: "success" | "failed" | "pending"
 }
 
-const typeConfig = {
-  stake: { label: "Stake", color: "text-emerald-400" as const, badge: "success" as const },
-  unstake: { label: "Unstake", color: "text-blue-400" as const, badge: "default" as const },
+const typeConfig: Record<string, { label: string; color: string; badge: "success" | "default" | "error" | "warning" }> = {
+  stake: { label: "Stake", color: "text-emerald-400", badge: "success" },
+  unstake: { label: "Unstake", color: "text-blue-400", badge: "default" },
+  yield: { label: "Yield", color: "text-amber-400", badge: "warning" },
+  fee: { label: "Fee", color: "text-red-400", badge: "error" },
 }
 
-function loadTxs(): Tx[] {
+function loadLocalTxs(): Tx[] {
   try {
     return JSON.parse(localStorage.getItem("stxlm_txs") || "[]")
   } catch {
@@ -30,31 +34,141 @@ function loadTxs(): Tx[] {
   }
 }
 
+async function fetchHorizonTxs(address: string): Promise<Tx[]> {
+  try {
+    const horizon = getHorizon()
+    const ops = await horizon
+      .operations()
+      .forAccount(address)
+      .limit(50)
+      .order("desc")
+      .call()
+
+    const txs: Tx[] = []
+    for (const op of ops.records) {
+      if (op.type === "invoke_host_function") {
+        const opRecord = op as unknown as Record<string, unknown>
+        const func = opRecord.function ?? ""
+        const funcStr = String(func)
+        const txHash = opRecord.transaction_hash as string
+        const createdAt = opRecord.created_at as string
+
+        if (funcStr.includes("deposit")) {
+          txs.push({
+            id: op.id,
+            type: "stake",
+            amount: "—",
+            asset: "XLM",
+            timestamp: createdAt,
+            hash: txHash,
+            status: opRecord.transaction_successful ? "success" : "failed",
+          })
+        } else if (funcStr.includes("withdraw")) {
+          txs.push({
+            id: op.id,
+            type: "unstake",
+            amount: "—",
+            asset: "stXLM",
+            timestamp: createdAt,
+            hash: txHash,
+            status: opRecord.transaction_successful ? "success" : "failed",
+          })
+        } else if (funcStr.includes("simulate_yield")) {
+          txs.push({
+            id: op.id,
+            type: "yield",
+            amount: "—",
+            asset: "XLM",
+            timestamp: createdAt,
+            hash: txHash,
+            status: opRecord.transaction_successful ? "success" : "failed",
+          })
+        }
+      }
+    }
+    return txs
+  } catch {
+    return []
+  }
+}
+
 export default function TransactionsPage() {
-  const [txs, setTxs] = useState<Tx[]>(loadTxs)
+  const { address } = useStellarWallet()
+  const { eventCount } = useSorobanEvents(address)
+  const [txs, setTxs] = useState<Tx[]>(() => {
+    if (typeof window !== "undefined") return loadLocalTxs()
+    return []
+  })
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const stored = loadTxs()
-      setTxs(stored)
-    }, 5000)
+    let cancelled = false
 
-    return () => clearInterval(interval)
-  }, [])
+    const load = async () => {
+      if (!address) {
+        if (!cancelled) {
+          setTxs(loadLocalTxs())
+          setLoading(false)
+        }
+        return
+      }
+
+      if (!cancelled) setLoading(true)
+      const [localTxs, horizonTxs] = await Promise.all([
+        Promise.resolve(loadLocalTxs()),
+        fetchHorizonTxs(address),
+      ])
+
+      if (cancelled) return
+
+      const seen = new Set<string>()
+      const merged: Tx[] = []
+
+      for (const tx of horizonTxs) {
+        if (!seen.has(tx.hash)) {
+          seen.add(tx.hash)
+          merged.push(tx)
+        }
+      }
+      for (const tx of localTxs) {
+        if (!seen.has(tx.hash)) {
+          seen.add(tx.hash)
+          merged.push(tx)
+        }
+      }
+
+      merged.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      setTxs(merged)
+      setLoading(false)
+    }
+
+    load()
+    const interval = setInterval(load, 15000)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [address, eventCount])
 
   return (
     <div className="flex flex-col gap-8">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <Heading>Transactions</Heading>
-        <p className="text-sm text-zinc-400 mt-1">Your staking transaction history</p>
+        <p className="text-sm text-zinc-400 mt-1">
+          {address ? "Your staking transaction history from the network" : "Connect your wallet to see your transaction history"}
+        </p>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-        {txs.length > 0 ? (
+        {loading ? (
+          <Card className="p-8 text-center">
+            <p className="text-zinc-400 animate-pulse">Loading transactions...</p>
+          </Card>
+        ) : txs.length > 0 ? (
           <Card className="p-0 overflow-hidden">
             <div className="divide-y divide-zinc-800/50">
               {txs.map((tx) => {
-                const cfg = typeConfig[tx.type]
+                const cfg = typeConfig[tx.type] || typeConfig.stake
                 const timeAgo = getTimeAgo(tx.timestamp)
                 const shortHash = tx.hash.slice(0, 7) + "..." + tx.hash.slice(-3)
                 return (
@@ -91,6 +205,7 @@ export default function TransactionsPage() {
         ) : (
           <Card className="p-8 text-center">
             <p className="text-zinc-400">No transactions yet</p>
+            <p className="text-zinc-600 text-sm mt-1">Start staking to see your history</p>
           </Card>
         )}
       </motion.div>
