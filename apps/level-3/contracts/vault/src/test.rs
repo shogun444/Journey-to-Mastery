@@ -35,7 +35,6 @@ fn setup_env() -> (Env, Address, Address, Address) {
         (
             admin.clone(),
             st_xlm.clone(),
-            xlm_token.clone(),
             treasury.clone(),
             0u32,
             0u32,
