@@ -12,9 +12,9 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 shadow-xl">
       <p className="text-xs text-zinc-400">{label}</p>
-      <p className="text-sm font-mono font-medium text-emerald-400">
-        1 XLM = {payload[0].value.toFixed(7)} stXLM
-      </p>
+       <p className="text-sm font-mono font-medium text-emerald-400">
+         1 XLM = {(1 / payload[0].value).toFixed(7)} stXLM
+       </p>
     </div>
   )
 }
@@ -55,7 +55,7 @@ export function LiveMarketCard({ baseRate = 1, livePoints: propPoints, currentRa
 
         <div className="flex items-baseline gap-2 mt-2 mb-3">
           <p className="text-3xl font-mono font-bold text-zinc-100">
-            1 XLM = {currentRate.toFixed(7)}
+             1 XLM = {(1 / currentRate).toFixed(7)}
           </p>
           <span className="text-sm text-zinc-500">stXLM</span>
         </div>

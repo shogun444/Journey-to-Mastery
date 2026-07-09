@@ -1,7 +1,6 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractevent, contractimpl, contracttype,
-    token::Client as TokenClient, Address, Env,
+    contract, contracterror, contractevent, contractimpl, contracttype, Address, Env,
 };
 
 mod st_xlm_token {
@@ -32,11 +31,11 @@ pub enum VaultError {
 pub enum DataKey {
     Admin,
     StXlmToken,
-    XlmToken,
     Treasury,
     DepositFeeBps,
     WithdrawFeeBps,
     Paused,
+    TotalAssets,
 }
 
 #[contractevent(topics = ["deposited"])]
@@ -92,7 +91,6 @@ impl Vault {
         env: Env,
         admin: Address,
         st_xlm: Address,
-        xlm_token: Address,
         treasury: Address,
         deposit_fee_bps: u32,
         withdraw_fee_bps: u32,
@@ -102,7 +100,6 @@ impl Vault {
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::StXlmToken, &st_xlm);
-        env.storage().instance().set(&DataKey::XlmToken, &xlm_token);
         env.storage().instance().set(&DataKey::Treasury, &treasury);
         env.storage()
             .instance()
@@ -111,6 +108,7 @@ impl Vault {
             .instance()
             .set(&DataKey::WithdrawFeeBps, &withdraw_fee_bps);
         env.storage().instance().set(&DataKey::Paused, &false);
+        env.storage().instance().set(&DataKey::TotalAssets, &0i128);
     }
 
     pub fn deposit(env: Env, sender: Address, assets: i128) -> i128 {
@@ -147,13 +145,8 @@ impl Vault {
             panic!("zero shares");
         }
 
-        Self::_transfer_xlm_in(&env, &sender, assets);
+        Self::_increase_assets(&env, assets);
         Self::_mint_st_xlm(&env, &sender, shares);
-
-        if fee > 0 {
-            let treasury: Address = env.storage().instance().get(&DataKey::Treasury).unwrap();
-            Self::_transfer_xlm_out(&env, &treasury, fee);
-        }
 
         Self::_emit_exchange_rate(&env);
         DepositedEvent {
@@ -198,12 +191,16 @@ impl Vault {
             panic!("zero assets");
         }
 
+        if net_assets > total_assets {
+            panic!("insufficient assets");
+        }
+
         Self::_burn_st_xlm(&env, &sender, shares);
-        Self::_transfer_xlm_out(&env, &sender, net_assets);
+        Self::_decrease_assets(&env, net_assets);
 
         if fee > 0 {
             let treasury: Address = env.storage().instance().get(&DataKey::Treasury).unwrap();
-            Self::_transfer_xlm_out(&env, &treasury, fee);
+            Self::_mint_st_xlm(&env, &treasury, fee * total_supply / total_assets);
         }
 
         Self::_emit_exchange_rate(&env);
@@ -331,10 +328,10 @@ impl Vault {
     }
 
     pub fn total_assets(env: Env) -> i128 {
-        let vault = env.current_contract_address();
-        let xlm_token: Address = env.storage().instance().get(&DataKey::XlmToken).unwrap();
-        let xlm_client = TokenClient::new(&env, &xlm_token);
-        xlm_client.balance(&vault)
+        env.storage()
+            .instance()
+            .get(&DataKey::TotalAssets)
+            .unwrap_or(0)
     }
 
     pub fn total_supply(env: Env) -> i128 {
@@ -359,10 +356,7 @@ impl Vault {
         if amount <= 0 {
             panic!("amount must be positive");
         }
-        let xlm_token: Address = env.storage().instance().get(&DataKey::XlmToken).unwrap();
-        let xlm_client = TokenClient::new(&env, &xlm_token);
-        let vault = env.current_contract_address();
-        xlm_client.transfer(&admin, &vault, &amount);
+        Self::_increase_assets(&env, amount);
         Self::_emit_exchange_rate(&env);
         YieldSimulatedEvent { amount }.publish(&env);
     }
@@ -450,18 +444,21 @@ impl Vault {
             .unwrap_or(0)
     }
 
-    fn _transfer_xlm_in(env: &Env, from: &Address, amount: i128) {
-        let xlm_token: Address = env.storage().instance().get(&DataKey::XlmToken).unwrap();
-        let xlm_client = TokenClient::new(env, &xlm_token);
-        let vault = env.current_contract_address();
-        xlm_client.transfer(from, &vault, &amount);
+    fn _increase_assets(env: &Env, amount: i128) {
+        let current: i128 = env.storage().instance().get(&DataKey::TotalAssets).unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalAssets, &(current + amount));
     }
 
-    fn _transfer_xlm_out(env: &Env, to: &Address, amount: i128) {
-        let xlm_token: Address = env.storage().instance().get(&DataKey::XlmToken).unwrap();
-        let xlm_client = TokenClient::new(env, &xlm_token);
-        let vault = env.current_contract_address();
-        xlm_client.transfer(&vault, to, &amount);
+    fn _decrease_assets(env: &Env, amount: i128) {
+        let current: i128 = env.storage().instance().get(&DataKey::TotalAssets).unwrap_or(0);
+        if current < amount {
+            panic!("insufficient assets");
+        }
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalAssets, &(current - amount));
     }
 
     fn _mint_st_xlm(env: &Env, to: &Address, amount: i128) {
