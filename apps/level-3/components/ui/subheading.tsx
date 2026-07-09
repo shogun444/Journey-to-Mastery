@@ -7,7 +7,7 @@ interface SubheadingProps {
 
 export function Subheading({ children, className }: SubheadingProps) {
   return (
-    <p className={cn("text-sm font-medium tracking-wide uppercase text-zinc-400", className)}>
+    <p className={cn("text-lg font-semibold text-neutral-400 leading-tight", className)}>
       {children}
     </p>
   )

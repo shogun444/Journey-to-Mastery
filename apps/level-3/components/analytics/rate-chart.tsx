@@ -44,16 +44,16 @@ export function RateChart({ data, currentRate, loading }: RateChartProps) {
         </div>
 
         {loading ? (
-          <div className="h-40 bg-zinc-900/50 rounded-lg animate-pulse flex items-center justify-center">
+          <div className="h-48 bg-zinc-900/50 rounded-lg animate-pulse flex items-center justify-center">
             <p className="text-zinc-600 text-sm">Loading chart...</p>
           </div>
         ) : data.length < 2 ? (
-          <div className="h-40 bg-zinc-900/50 rounded-lg flex flex-col items-center justify-center gap-2">
+          <div className="h-48 bg-zinc-900/50 rounded-lg flex flex-col items-center justify-center gap-2">
             <p className="text-zinc-500 text-sm">Collecting rate data...</p>
             <p className="text-zinc-600 text-xs">Rate history will appear as data accumulates</p>
           </div>
         ) : (
-          <div className="h-40">
+          <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data} margin={{ top: 4, right: 4, bottom: 4, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />

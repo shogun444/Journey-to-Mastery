@@ -103,12 +103,59 @@ Deployed AMM contract on Stellar testnet wrapping DEX path payments with `SwapEx
 - **Deploy Tx:** [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/99eae42899d64d41f529e6ceeed98c1520b063d19a441fe3786c972d80953e27)
 - **Contract Call Tx:** [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/416fb36f7cf87101400adc34ba5b4f49547bb71854aacf200502981a2fc4144f)
 
+## Level 3: stXLM Liquid Staking Vault (Orange Belt)
+
+A liquid staking protocol on Stellar Testnet. Stake XLM and receive stXLM, a yield-bearing receipt token. Inspired by the ERC-4626 tokenized vault standard, built with two Soroban smart contracts communicating via cross-contract calls.
+
+Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **motion/react**, **@stellar/stellar-sdk**, and **soroban-sdk**.
+
+### Features
+
+- **Smart Contracts:** stXLM token (SEP-41) + Vault (ERC-4626-inspired) with cross-contract communication
+- **Multi-wallet:** Freighter, LOBSTR, xBull, Albedo, Rabet, Hana via Stellar Wallets Kit
+- **Stake XLM:** Deposit XLM → receive stXLM with live preview + fee breakdown
+- **Unstake stXLM:** Burn stXLM → withdraw XLM + accrued yield
+- **Event-driven refresh:** Soroban `getEvents()` polling detects deposits/withdraws → instant re-fetch
+- **Live market rate:** Streaming exchange rate with green/red trend indicators
+- **Analytics:** 6 chart types (activity, rate history, portfolio, live market, stats)
+- **Preview Display:** Live rate, slippage calculator, and fees shown inside the "You Receive" box with color-coded rate trend (green up / red down)
+- **Optimistic UI:** Balance updates immediately on submit, reverts on failure
+- **CI/CD:** GitHub Actions with format → clippy → test → build → deploy pipeline (10+ passing contract tests)
+- **Production architecture:** Yield adapter interface, fee model, pause/unpause, treasury management
+- **5 frontend pages:** Dashboard, Stake, Unstake, Analytics, Transactions
+
+### Deployed Contracts (Testnet)
+
+| Contract | Address |
+|----------|---------|
+| **stXLM Token** | `CDLVFCJFKYQX4LO2CUVAWF3A5ENHNX3K6552KRFDEF36IIHORDEIVO7W` |
+| **Vault** | `CBJHCW2ENU2TEGY6CNCFKRR4UZL6K7XUT3SS3O55NCKBK4IVRDUXXAJS` |
+
+### On-Chain Transactions
+
+| Type | Hash |
+|------|------|
+| Deposit (12 XLM → 12 stXLM) | `1f98ec47a42ad38c77667225f58b0fd760fb0c77a7d3feecc608cd6880e560d5` |
+| Withdraw (2 stXLM → 2 XLM) | `32e96e380e342d9d801dd246d4cf8562cae0faf869f8fff05b9e0c73c341b831` |
+
+### Setup
+
+```sh
+cd apps/level-3
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+Open [http://localhost:3002](http://localhost:3002).
+
 ## Future Levels
 
 | Level | Topic | Status |
 |---|---|---|
 | **1** | Simple Payment dApp (White Belt) | Complete |
 | **2** | Token Swap Interface (Yellow Belt) | Complete |
+| **3** | stXLM Liquid Staking Vault (Orange Belt) | Complete |
 
 ## Commands
 
@@ -121,4 +168,8 @@ pnpm dev --filter=web        # Level 2 dev server (port 3000)
 pnpm build --filter=web      # Build Level 2
 pnpm lint --filter=web       # Lint Level 2
 pnpm check-types --filter=web    # TypeScript check (Level 2)
+cd apps/level-3 && npm run dev       # Level 3 dev server (port 3002)
+cd apps/level-3 && npm run build     # Build Level 3
+cd apps/level-3 && npm run lint      # Lint Level 3
+cd apps/level-3 && npm run check-types  # TypeScript check (Level 3)
 ```

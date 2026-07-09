@@ -135,14 +135,11 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
             label="You receive"
             value={`${previewShares} stXLM`}
             tooltip="Estimated stXLM to receive at the current market rate. Final amount may vary."
+            rate={amountNum > 0 ? `1 XLM ≈ ${(1 / liveRate).toFixed(7)} stXLM` : undefined}
+            rateTrend={amountNum > 0 ? (lastChange >= 0 ? "up" : "down") : undefined}
+            slippage={amountNum > 0 ? "0.50%" : undefined}
+            fee={amountNum > 0 ? "0%" : undefined}
           />
-
-          {amountNum > 0 && xlmNum > 0 && (
-            <div className="flex justify-between text-xs text-zinc-500 px-1">
-              <span>Live rate: 1 XLM ≈ {(1 / liveRate).toFixed(7)} stXLM</span>
-              <span>Fee: 0%</span>
-            </div>
-          )}
 
           <Button
             variant="success"

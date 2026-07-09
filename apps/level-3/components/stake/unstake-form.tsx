@@ -135,14 +135,11 @@ export function UnstakeForm({ exchangeRate, vaultLoading, stXlmBalance, onSucces
             label="You receive"
             value={`${previewXlm} XLM`}
             tooltip="Estimated XLM to receive at the current market rate including accrued yield. Final amount may vary."
+            rate={amountNum > 0 ? `1 stXLM ≈ ${liveRate.toFixed(7)} XLM` : undefined}
+            rateTrend={amountNum > 0 ? (lastChange >= 0 ? "up" : "down") : undefined}
+            slippage={amountNum > 0 ? "0.50%" : undefined}
+            fee={amountNum > 0 ? "0%" : undefined}
           />
-
-          {amountNum > 0 && (
-            <div className="flex justify-between text-xs text-zinc-500 px-1">
-              <span>Live rate: 1 stXLM ≈ {liveRate.toFixed(7)} XLM</span>
-              <span>Fee: 0%</span>
-            </div>
-          )}
 
           <Button
             variant="success"

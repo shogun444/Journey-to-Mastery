@@ -1,8 +1,10 @@
-# stXLM — Liquid Staking Vault for Stellar
+# stXLM — Liquid Staking Vault for Stellar (Level 3)
 
-[![CI/CD](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ci.yml)
+[![CI/CD](https://github.com/shogun444/Journey-to-Mastery/actions/workflows/ci.yml/badge.svg)](https://github.com/shogun444/Journey-to-Mastery/actions/workflows/ci.yml)
 
-A liquid staking protocol on Stellar Testnet. Stake XLM and receive stXLM, a yield-bearing receipt token. Inspired by the ERC-4626 tokenized vault standard, built on Soroban smart contracts.
+**Built for the Stellar Journey to Mastery Challenge — Level 3: Advanced Smart Contracts + Production-Ready dApps**
+
+A liquid staking protocol on Stellar Testnet. Stake XLM and receive stXLM, a yield-bearing receipt token. Inspired by the ERC-4626 tokenized vault standard, built on Soroban smart contracts with cross-contract communication, event-driven architecture, and a production-ready CI/CD pipeline.
 
 ## Demo
 
@@ -72,6 +74,27 @@ Next.js 16 (App Router), Tailwind CSS v4, motion/react, Stellar Wallets Kit (Fre
 | Unstake | `/unstake` | Burn stXLM, preview XLM payout, optimistic UI |
 | Analytics | `/analytics` | Protocol metrics: TVL, APY, total supply, exchange rate history, activity chart |
 | Transactions | `/transactions` | On-chain transaction history from Horizon + Soroban events |
+
+## Challenge Requirements Checklist
+
+| Requirement | Status |
+|---|---|
+| Smart contract development (2 contracts, cross-contract calls) | ✅ |
+| Inter-contract communication (Vault → stXLM token) | ✅ |
+| Event streaming & real-time updates (Soroban `getEvents()` polling) | ✅ |
+| CI/CD pipeline (GitHub Actions: format → clippy → test → build → deploy) | ✅ |
+| Smart contract deployment workflow (WASM build → deploy to testnet) | ✅ |
+| Mobile responsive frontend (hamburger menu, responsive grids) | ✅ |
+| Error handling & loading states (7 error types, loading skeletons) | ✅ |
+| Contract tests (10+ passing — 6 vault + 4 token) | ✅ |
+| Production-ready architecture (fee model, pause/unpause, treasury, yield adapter) | ✅ |
+| Documentation & demo (architecture, security, tokenomics, math, roadmap, deployment) | ✅ |
+
+## Recent Changes
+
+- **Preview Display enhancement:** The "You Receive" box now shows live rate (color-coded green/red based on trend), slippage tolerance (0.50%), and fees (0%) in a clean card layout with `font-mono` typography
+- **Dashboard stats visibility:** Staked Value, APY, and Total Staked cards are now always visible (removed conditional `stxlmNum > 0` guard and entry animations)
+- **Rate trend indicators:** Live Rate text turns green on positive movement, red on negative movement
 
 ### Key Features
 

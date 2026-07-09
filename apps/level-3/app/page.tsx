@@ -36,6 +36,20 @@ export default function DashboardPage() {
   const profitLoss = stakedXlmValue - stxlmNum
   const apy = rate > 1 ? ((rate - 1) * 100).toFixed(2) : "0.00"
 
+  const plColor = profitLoss > 0 ? "text-emerald-400" : profitLoss < 0 ? "text-red-400" : "text-zinc-100"
+  const rateColor = rate > 1 ? "text-emerald-400" : rate < 1 ? "text-red-400" : "text-zinc-100"
+  const stakedColor = stakedXlmValue > stxlmNum ? "text-emerald-400" : stakedXlmValue < stxlmNum ? "text-red-400" : "text-zinc-100"
+
+  const iconColors = [
+    { bg: "bg-amber-500/10", icon: "text-amber-400" },
+    { bg: "bg-emerald-500/10", icon: "text-emerald-400" },
+    { bg: "bg-blue-500/10", icon: "text-blue-400" },
+    { bg: rate > 1 ? "bg-emerald-500/10" : "bg-red-500/10", icon: rate > 1 ? "text-emerald-400" : "text-red-400" },
+    { bg: "bg-purple-500/10", icon: "text-purple-400" },
+    { bg: "bg-cyan-500/10", icon: "text-cyan-400" },
+    { bg: "bg-pink-500/10", icon: "text-pink-400" },
+  ]
+
   return (
     <div className="flex flex-col gap-8">
       <motion.div
@@ -61,14 +75,14 @@ export default function DashboardPage() {
       >
         <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-              <Wallet size={20} className="text-blue-400" />
+            <div className={`w-10 h-10 rounded-lg ${iconColors[0].bg} flex items-center justify-center`}>
+              <Wallet size={20} className={iconColors[0].icon} />
             </div>
             <div>
               <Subheading>XLM Balance</Subheading>
               <p className="text-2xl font-mono font-semibold text-zinc-100 mt-0.5">
                 {xlmNum.toFixed(2)}{" "}
-                <span className="text-sm text-zinc-500">XLM</span>
+                <span className="text-sm text-zinc-500 whitespace-nowrap">XLM</span>
               </p>
             </div>
           </div>
@@ -76,14 +90,14 @@ export default function DashboardPage() {
 
         <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-              <Coins size={20} className="text-emerald-400" />
+            <div className={`w-10 h-10 rounded-lg ${iconColors[1].bg} flex items-center justify-center`}>
+              <Coins size={20} className={iconColors[1].icon} />
             </div>
             <div>
               <Subheading>stXLM Balance</Subheading>
               <p className="text-2xl font-mono font-semibold text-emerald-400 mt-0.5">
                 {stxlmNum.toFixed(2)}{" "}
-                <span className="text-sm text-zinc-500">stXLM</span>
+                <span className="text-sm text-zinc-500 whitespace-nowrap">stXLM</span>
               </p>
             </div>
           </div>
@@ -91,14 +105,14 @@ export default function DashboardPage() {
 
         <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
-              <TrendUp size={20} className="text-zinc-400" />
+            <div className={`w-10 h-10 rounded-lg ${iconColors[2].bg} flex items-center justify-center`}>
+              <TrendUp size={20} className={iconColors[2].icon} />
             </div>
             <div>
               <Subheading>Yield Earned</Subheading>
-              <p className={`text-2xl font-mono font-semibold mt-0.5 ${profitLoss > 0 ? "text-emerald-400" : "text-zinc-500"}`}>
-                {profitLoss > 0 ? "+" : ""}{profitLoss.toFixed(2)}{" "}
-                <span className="text-sm text-zinc-500">XLM</span>
+              <p className={`text-2xl font-mono font-semibold mt-0.5 ${plColor}`}>
+                {profitLoss > 0 ? "+" : profitLoss < 0 ? "" : ""}{profitLoss.toFixed(2)}{" "}
+                <span className="text-sm text-zinc-500 whitespace-nowrap">XLM</span>
               </p>
             </div>
           </div>
@@ -106,56 +120,61 @@ export default function DashboardPage() {
 
         <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
-              <ArrowUpRight size={20} className="text-zinc-400" />
+            <div className={`w-10 h-10 rounded-lg ${iconColors[3].bg} flex items-center justify-center`}>
+              <ArrowUpRight size={20} className={iconColors[3].icon} />
             </div>
             <div>
               <Subheading>Exchange Rate</Subheading>
-              <p className="text-2xl font-mono font-semibold text-zinc-100 mt-0.5">
-                {vaultLoading ? "..." : rate.toFixed(4)}{" "}
-                <span className="text-sm text-zinc-500">XLM/stXLM</span>
+              <p className={`text-2xl font-mono font-semibold mt-0.5 ${rateColor}`}>
+                {vaultLoading ? "..." : rate.toFixed(4)}
+                <span className="text-[10px] text-zinc-500 align-sub whitespace-nowrap ml-0.5">XLM/stXLM</span>
               </p>
             </div>
           </div>
         </Card>
       </motion.div>
 
-      {stxlmNum > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
-        >
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
-              <Clock size={14} />
-              <Subheading>Staked Value</Subheading>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+      >
+        <Card className="p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className={`w-10 h-10 rounded-lg ${iconColors[4].bg} flex items-center justify-center`}>
+              <Clock size={20} className={iconColors[4].icon} />
             </div>
-            <p className="text-xl font-mono font-semibold text-zinc-100">
-              {stakedXlmValue.toFixed(2)} <span className="text-sm text-zinc-500">XLM</span>
-            </p>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
-              <TrendUp size={14} />
-              <Subheading>APY</Subheading>
+            <Subheading>Staked Value</Subheading>
+          </div>
+          <p className={`text-xl font-mono font-semibold ${stakedColor}`}>
+            {stxlmNum > 0 ? `${stakedXlmValue.toFixed(2)}` : "0.00"}
+            <span className="text-[10px] text-zinc-500 align-sub whitespace-nowrap ml-0.5">XLM</span>
+          </p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className={`w-10 h-10 rounded-lg ${iconColors[5].bg} flex items-center justify-center`}>
+              <TrendUp size={20} className={iconColors[5].icon} />
             </div>
-            <p className="text-xl font-mono font-semibold text-emerald-400">
-              {apy}%
-            </p>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
-              <Coins size={14} />
-              <Subheading>Total Staked</Subheading>
+            <Subheading>APY</Subheading>
+          </div>
+          <p className="text-xl font-mono font-semibold text-emerald-400">
+            {apy}%
+          </p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className={`w-10 h-10 rounded-lg ${iconColors[6].bg} flex items-center justify-center`}>
+              <Coins size={20} className={iconColors[6].icon} />
             </div>
-            <p className="text-xl font-mono font-semibold text-zinc-100">
-              {stxlmNum.toFixed(2)} <span className="text-sm text-zinc-500">stXLM</span>
-            </p>
-          </Card>
-        </motion.div>
-      )}
+            <Subheading>Total Staked</Subheading>
+          </div>
+          <p className="text-xl font-mono font-semibold text-zinc-100">
+            {stxlmNum.toFixed(2)} <span className="text-sm text-zinc-500 whitespace-nowrap">stXLM</span>
+          </p>
+        </Card>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
