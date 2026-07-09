@@ -171,9 +171,7 @@ export async function buildDepositTx(source: string, assets: string): Promise<st
 
   const sorobanData = new StellarSdk.SorobanDataBuilder()
     .setFootprint([], [userKey])
-    .setInstructionsLimit(10_000_000)
-    .setReadBytes(200_000)
-    .setWriteBytes(100_000)
+    .setResources(10_000_000, 200_000, 100_000)
     .build()
 
   const tx = new StellarSdk.TransactionBuilder(account, {
