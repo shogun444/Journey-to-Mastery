@@ -5,7 +5,7 @@ const NETWORK = process.env.NEXT_PUBLIC_STELLAR_NETWORK ?? "testnet"
 export const config = {
   testnet: {
     horizonUrl: "https://horizon-testnet.stellar.org",
-    rpcUrl: "https://soroban-testnet.stellar.org",
+    rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL ?? "https://soroban-testnet.stellar.org",
     networkPassphrase: StellarSdk.Networks.TESTNET,
     friendbotUrl: "https://friendbot.stellar.org",
   },

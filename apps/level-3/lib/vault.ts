@@ -2,6 +2,12 @@ import * as StellarSdk from "@stellar/stellar-sdk"
 import { getRpc, config, VAULT_CONTRACT_ID } from "./stellar"
 import { SorobanError, parseSorobanError } from "./errors"
 
+const FALLBACK_RPC_URLS = [
+  "https://soroban-testnet.stellar.org",
+  "https://stellar-soroban-testnet-public.nodies.app",
+  "https://soroban-rpc.testnet.stellar.gateway.fm",
+]
+
 function vaultContract() {
   return new StellarSdk.Contract(VAULT_CONTRACT_ID)
 }
@@ -163,41 +169,55 @@ export async function previewWithdraw(shares: string, source: string): Promise<s
 export async function buildDepositTx(source: string, assets: string): Promise<string> {
   const account = await getRpc().getAccount(source)
 
-  const userKey = StellarSdk.xdr.LedgerKey.account(
-    new StellarSdk.xdr.LedgerKeyAccount({
-      accountId: StellarSdk.Keypair.fromPublicKey(source).xdrAccountId(),
+  const buildTx = (seqNum: string) => {
+    const acc = new StellarSdk.Account(source, seqNum)
+    return new StellarSdk.TransactionBuilder(acc, {
+      fee: StellarSdk.BASE_FEE,
+      networkPassphrase: config.networkPassphrase,
     })
-  )
-
-  const sorobanData = new StellarSdk.SorobanDataBuilder()
-    .setFootprint([], [userKey])
-    .setResources(10_000_000, 200_000, 100_000)
-    .build()
-
-  const tx = new StellarSdk.TransactionBuilder(account, {
-    fee: StellarSdk.BASE_FEE,
-    networkPassphrase: config.networkPassphrase,
-    sorobanData,
-  })
-    .addOperation(
-      vaultContract().call(
-        "deposit",
-        StellarSdk.Address.fromString(source).toScVal(),
-        StellarSdk.nativeToScVal(assets, { type: "i128" })
+      .addOperation(
+        vaultContract().call(
+          "deposit",
+          StellarSdk.Address.fromString(source).toScVal(),
+          StellarSdk.nativeToScVal(assets, { type: "i128" })
+        )
       )
-    )
-    .setTimeout(180)
-    .build()
+      .setTimeout(180)
+      .build()
+  }
 
-  const simulation = await getRpc().simulateTransaction(tx)
-  if (StellarSdk.rpc.Api.isSimulationError(simulation)) {
-    const parsed = parseSorobanError(simulation.error)
-    const msg = parsed.code === "UNKNOWN" ? `Simulation error: ${simulation.error}` : parsed.friendlyMessage
+  const trySimulate = async (rpc: StellarSdk.rpc.Server, tx: StellarSdk.Transaction) => {
+    const sim = await rpc.simulateTransaction(tx)
+    if (StellarSdk.rpc.Api.isSimulationError(sim)) {
+      return { success: false as const, error: sim.error }
+    }
+    return { success: true as const, assembled: StellarSdk.rpc.assembleTransaction(tx, sim).build() }
+  }
+
+  let tx = buildTx(account.sequenceNumber())
+  let result = await trySimulate(getRpc(), tx)
+
+  if (!result.success) {
+    const errStr = String(result.error ?? "")
+    if (errStr.includes("BalanceError") || errStr.includes("resulting balance is not within")) {
+      for (const rpcUrl of FALLBACK_RPC_URLS) {
+        if (rpcUrl === config.rpcUrl) continue
+        try {
+          const fallbackRpc = new StellarSdk.rpc.Server(rpcUrl)
+          const fallbackAccount = await fallbackRpc.getAccount(source)
+          const fallbackTx = buildTx(fallbackAccount.sequenceNumber())
+          result = await trySimulate(fallbackRpc, fallbackTx)
+          if (result.success) return result.assembled.toXDR()
+        } catch {}
+      }
+    }
+
+    const parsed = parseSorobanError(result.error)
+    const msg = parsed.code === "UNKNOWN" ? `Simulation error: ${result.error}` : parsed.friendlyMessage
     throw new SorobanError(parsed.code, msg)
   }
 
-  const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build()
-  return assembled.toXDR()
+  return result.assembled.toXDR()
 }
 
 export async function buildWithdrawTx(source: string, shares: string): Promise<string> {
