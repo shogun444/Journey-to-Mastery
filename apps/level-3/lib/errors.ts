@@ -25,20 +25,6 @@ export function parseSorobanError(error: unknown): ParsedError {
     }
   }
 
-  if (errStr.includes("Insufficient XLM balance")) {
-    return {
-      code: "INSUFFICIENT_BALANCE",
-      friendlyMessage: "You don't have enough XLM in your wallet to complete this transaction.",
-    }
-  }
-
-  if (errStr.includes("VM trap") || errStr.includes("HostError")) {
-    return {
-      code: "UNKNOWN",
-      friendlyMessage: "Transaction simulation failed. Please try again or check your wallet balance.",
-    }
-  }
-
   return {
     code: "UNKNOWN",
     friendlyMessage: errStr,
