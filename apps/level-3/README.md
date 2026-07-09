@@ -55,13 +55,17 @@ rate   = total_assets / total_supply
 
 ## Screenshots
 
-| Dashboard | Stake | Analytics |
-|-----------|-------|-----------|
-| ![Dashboard](screenshots/dashboard.png) | ![Stake](screenshots/stake.png) | ![Analytics](screenshots/analytics.png) |
+| Stake | Stake Details |
+|-------|---------------|
+| ![Stake](screenshots/stakeXLM.png) | ![Stake Details](screenshots/stakeXLM(details).png) |
 
-| Transactions | Mobile Dashboard | Mobile Stake |
-|-------------|-----------------|--------------|
-| ![Transactions](screenshots/transactions.png) | ![Mobile Dashboard](screenshots/mobile-dashboard.png) | ![Mobile Stake](screenshots/mobile-stake.png) |
+| Unstake | Unstake Details |
+|---------|-----------------|
+| ![Unstake](screenshots/unStakeXLM.png) | ![Unstake Details](screenshots/unStakeXLM(transactiondetails).png) |
+
+| Deposit on StellarExpert | Withdraw on StellarExpert |
+|--------------------------|---------------------------|
+| ![Deposit](screenshots/transactionsuccesfullStellarExpert(depsoit).png) | ![Withdraw](screenshots/transactionSuccesfullStellarExpert(unstake).png) |
 
 ## Frontend
 
