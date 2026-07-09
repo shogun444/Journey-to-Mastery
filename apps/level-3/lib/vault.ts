@@ -178,11 +178,9 @@ export async function buildDepositTx(source: string, assets: string): Promise<st
 
   const simulation = await getRpc().simulateTransaction(tx)
   if (StellarSdk.rpc.Api.isSimulationError(simulation)) {
-    if (simulation.error?.includes("resulting balance is not within the allowed range")) {
-      throw new SorobanError("INSUFFICIENT_BALANCE", "Insufficient XLM balance")
-    }
     const parsed = parseSorobanError(simulation.error)
-    throw new SorobanError(parsed.code, parsed.friendlyMessage)
+    const msg = parsed.code === "UNKNOWN" ? `Simulation error: ${simulation.error}` : parsed.friendlyMessage
+    throw new SorobanError(parsed.code, msg)
   }
 
   const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build()

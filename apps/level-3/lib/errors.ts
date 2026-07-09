@@ -25,7 +25,7 @@ export function parseSorobanError(error: unknown): ParsedError {
     }
   }
 
-  if (errStr.includes("Insufficient XLM balance") || errStr.includes("resulting balance is not within the allowed range")) {
+  if (errStr.includes("Insufficient XLM balance")) {
     return {
       code: "INSUFFICIENT_BALANCE",
       friendlyMessage: "You don't have enough XLM in your wallet to complete this transaction.",
