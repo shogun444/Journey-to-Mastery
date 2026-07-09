@@ -21,7 +21,7 @@ export function parseSorobanError(error: unknown): ParsedError {
     return {
       code: "TRUSTLINE_MISSING",
       friendlyMessage:
-        "Your account needs a trustline for the Stellar Asset Contract (SAC) before you can stake XLM. Add the contract ID below as a trustline via Stellar Laboratory.",
+        "Your account needs trustlines for both the XLM SAC and stXLM contracts before you can stake. Add both contract IDs below as trustlines via Stellar Laboratory.",
     }
   }
 

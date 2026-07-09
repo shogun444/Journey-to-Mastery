@@ -98,11 +98,17 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
           <Input
             label="Amount (XLM)"
             type="number"
-            placeholder="0.0"
+            min="2"
+            step="any"
+            placeholder="2.0"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             disabled={!address || isPending}
           />
+
+          {amountNum > 0 && amountNum < 2 && (
+            <p className="text-xs text-amber-400">Minimum stake is 2 XLM</p>
+          )}
 
           <div className="flex items-center justify-between text-xs">
             <span className="text-zinc-500">
@@ -146,7 +152,7 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
             variant="success"
             size="lg"
             className="w-full mt-2"
-            disabled={!address || !amount || amountNum <= 0 || amountNum > effectiveXlm || vaultLoading}
+            disabled={!address || !amount || amountNum < 2 || amountNum > effectiveXlm || vaultLoading}
             loading={isPending}
             onClick={handleDeposit}
           >
