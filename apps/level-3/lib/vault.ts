@@ -162,9 +162,21 @@ export async function previewWithdraw(shares: string, source: string): Promise<s
 
 export async function buildDepositTx(source: string, assets: string): Promise<string> {
   const account = await getRpc().getAccount(source)
+
+  const sourceLedgerKey = StellarSdk.xdr.LedgerKey.account(
+    new StellarSdk.xdr.LedgerKeyAccount({
+      accountId: StellarSdk.Keypair.fromPublicKey(source).xdrAccountId(),
+    })
+  )
+
+  const sorobanData = new StellarSdk.SorobanDataBuilder()
+    .setFootprint([sourceLedgerKey], [])
+    .build()
+
   const tx = new StellarSdk.TransactionBuilder(account, {
     fee: StellarSdk.BASE_FEE,
     networkPassphrase: config.networkPassphrase,
+    sorobanData,
   })
     .addOperation(
       vaultContract().call(
