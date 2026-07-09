@@ -445,14 +445,22 @@ impl Vault {
     }
 
     fn _increase_assets(env: &Env, amount: i128) {
-        let current: i128 = env.storage().instance().get(&DataKey::TotalAssets).unwrap_or(0);
+        let current: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalAssets)
+            .unwrap_or(0);
         env.storage()
             .instance()
             .set(&DataKey::TotalAssets, &(current + amount));
     }
 
     fn _decrease_assets(env: &Env, amount: i128) {
-        let current: i128 = env.storage().instance().get(&DataKey::TotalAssets).unwrap_or(0);
+        let current: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalAssets)
+            .unwrap_or(0);
         if current < amount {
             panic!("insufficient assets");
         }
