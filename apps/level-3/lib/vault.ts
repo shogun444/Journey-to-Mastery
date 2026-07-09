@@ -1,5 +1,6 @@
 import * as StellarSdk from "@stellar/stellar-sdk"
 import { getRpc, config, VAULT_CONTRACT_ID } from "./stellar"
+import { SorobanError, parseSorobanError } from "./errors"
 
 function vaultContract() {
   return new StellarSdk.Contract(VAULT_CONTRACT_ID)
@@ -177,10 +178,11 @@ export async function buildDepositTx(source: string, assets: string): Promise<st
 
   const simulation = await getRpc().simulateTransaction(tx)
   if (StellarSdk.rpc.Api.isSimulationError(simulation)) {
-    const msg = simulation.error?.includes("resulting balance is not within the allowed range")
-      ? "Insufficient XLM balance"
-      : `Simulation failed: ${simulation.error}`
-    throw new Error(msg)
+    if (simulation.error?.includes("resulting balance is not within the allowed range")) {
+      throw new SorobanError("INSUFFICIENT_BALANCE", "Insufficient XLM balance")
+    }
+    const parsed = parseSorobanError(simulation.error)
+    throw new SorobanError(parsed.code, parsed.friendlyMessage)
   }
 
   const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build()
@@ -205,7 +207,8 @@ export async function buildWithdrawTx(source: string, shares: string): Promise<s
 
   const simulation = await getRpc().simulateTransaction(tx)
   if (StellarSdk.rpc.Api.isSimulationError(simulation)) {
-    throw new Error(`Simulation failed: ${simulation.error}`)
+    const parsed = parseSorobanError(simulation.error)
+    throw new SorobanError(parsed.code, parsed.friendlyMessage)
   }
 
   const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build()
@@ -224,7 +227,8 @@ export async function buildSimulateYieldTx(source: string, amount: string): Prom
 
   const simulation = await getRpc().simulateTransaction(tx)
   if (StellarSdk.rpc.Api.isSimulationError(simulation)) {
-    throw new Error(`Simulation failed: ${simulation.error}`)
+    const parsed = parseSorobanError(simulation.error)
+    throw new SorobanError(parsed.code, parsed.friendlyMessage)
   }
 
   const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build()

@@ -3,6 +3,7 @@
 import { buildDepositTx, buildWithdrawTx } from "@/lib/vault"
 import { submitSorobanTransaction } from "@/lib/transactions"
 import { useTransactionStatus } from "./useTransactionStatus"
+import { SorobanError } from "@/lib/errors"
 import type { TxState } from "@/types"
 
 interface UseStakeReturn {
@@ -50,7 +51,9 @@ export function useStake(): UseStakeReturn {
       await startPolling(hash)
       if (onSuccess) onSuccess(hash)
     } catch (err: unknown) {
-      updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })
+      const code = err instanceof SorobanError ? err.code : "UNKNOWN"
+      const msg = err instanceof Error ? err.message : "Transaction failed"
+      updateStatus("failed", { error: msg, errorCode: code })
     }
   }
 
@@ -71,7 +74,9 @@ export function useStake(): UseStakeReturn {
       await startPolling(hash)
       if (onSuccess) onSuccess(hash)
     } catch (err: unknown) {
-      updateStatus("failed", { error: err instanceof Error ? err.message : "Transaction failed" })
+      const code = err instanceof SorobanError ? err.code : "UNKNOWN"
+      const msg = err instanceof Error ? err.message : "Transaction failed"
+      updateStatus("failed", { error: msg, errorCode: code })
     }
   }
 

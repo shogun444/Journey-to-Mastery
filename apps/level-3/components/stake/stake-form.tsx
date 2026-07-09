@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Heading } from "@/components/ui/heading"
 import { PreviewDisplay } from "./preview-display"
 import { TransactionSuccessModal, type SuccessDetails } from "./transaction-success-modal"
+import { TrustlineCard } from "./trustline-card"
 import { useStake } from "@/hooks/useStake"
 import { useStellarWallet } from "@/hooks/useStellarWallet"
 import { useLiveMarket } from "@/hooks/useLiveMarket"
@@ -152,7 +153,10 @@ export function StakeForm({ exchangeRate, vaultLoading, xlmBalance, onSuccess }:
             {!address ? "Connect Wallet" : isPending ? "Confirming..." : "Stake XLM"}
           </Button>
 
-          {tx.status === "failed" && (
+          {tx.status === "failed" && tx.errorCode === "TRUSTLINE_MISSING" && (
+            <TrustlineCard />
+          )}
+          {tx.status === "failed" && tx.errorCode !== "TRUSTLINE_MISSING" && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

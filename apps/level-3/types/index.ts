@@ -29,6 +29,7 @@ export interface TxState {
   status: TxStatus
   hash?: string
   error?: string
+  errorCode?: string
   message?: string
 }
 
