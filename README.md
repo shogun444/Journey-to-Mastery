@@ -107,6 +107,8 @@ Deployed AMM contract on Stellar testnet wrapping DEX path payments with `SwapEx
 
 [![Demo Video](https://img.youtube.com/vi/sQwNQjlO2u0/0.jpg)](https://www.youtube.com/watch?v=sQwNQjlO2u0)
 
+**Live demo:** [https://journey-to-mastery-level-3.vercel.app](https://journey-to-mastery-level-3.vercel.app) · **Demo video:** [Watch on YouTube](https://www.youtube.com/watch?v=sQwNQjlO2u0)
+
 A liquid staking protocol on Stellar Testnet. Stake XLM and receive stXLM, a yield-bearing receipt token. Inspired by the ERC-4626 tokenized vault standard, built with two Soroban smart contracts communicating via cross-contract calls.
 
 Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **motion/react**, **@stellar/stellar-sdk**, and **soroban-sdk**.
@@ -128,17 +130,17 @@ Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **motion/react**
 
 ### Deployed Contracts (Testnet)
 
-| Contract | Address |
-|----------|---------|
-| **stXLM Token** | `CDRE2N4LUYSRG77MB3K47XGI2MIV5OHX6CGXEYUEOKG3ALK25I2RZT2S` |
-| **Vault** | `CAAVEIWGXQDBORNWDSNYMEB42L4A6Z6P3WC4QA3PLJ3U5IUXLYFQWQM5` |
+| Contract | Address | Explorer |
+|----------|---------|----------|
+| **stXLM Token** | `CDRE2N4LUYSRG77MB3K47XGI2MIV5OHX6CGXEYUEOKG3ALK25I2RZT2S` | [View](https://stellar.expert/explorer/testnet/contract/CDRE2N4LUYSRG77MB3K47XGI2MIV5OHX6CGXEYUEOKG3ALK25I2RZT2S) |
+| **Vault** | `CAAVEIWGXQDBORNWDSNYMEB42L4A6Z6P3WC4QA3PLJ3U5IUXLYFQWQM5` | [View](https://stellar.expert/explorer/testnet/contract/CAAVEIWGXQDBORNWDSNYMEB42L4A6Z6P3WC4QA3PLJ3U5IUXLYFQWQM5) |
 
 ### On-Chain Transactions
 
-| Type | Hash |
-|------|------|
-| Deposit (10 XLM → 10 stXLM) | `e1f6b1b21235a241de22c4c68017c2478eccddd0e6a090d21ee63b39d743722b` |
-| Withdraw (5 stXLM → 5 XLM) | `491e88ed620c8613c2caf256b45fc4f6b307e48e60253824c197f9916aaeb9b0` |
+| Type | Hash | Explorer |
+|------|------|----------|
+| Deposit (10 XLM → 10 stXLM) | `e1f6b1b21235a241de22c4c68017c2478eccddd0e6a090d21ee63b39d743722b` | [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/e1f6b1b21235a241de22c4c68017c2478eccddd0e6a090d21ee63b39d743722b) |
+| Withdraw (5 stXLM → 5 XLM) | `491e88ed620c8613c2caf256b45fc4f6b307e48e60253824c197f9916aaeb9b0` | [View on StellarExpert](https://stellar.expert/explorer/testnet/tx/491e88ed620c8613c2caf256b45fc4f6b307e48e60253824c197f9916aaeb9b0) |
 
 ### Setup
 
