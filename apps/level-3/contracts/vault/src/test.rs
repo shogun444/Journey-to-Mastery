@@ -32,13 +32,7 @@ fn setup_env() -> (Env, Address, Address, Address) {
     // Deploy vault
     let vault = env.register(
         Vault,
-        (
-            admin.clone(),
-            st_xlm.clone(),
-            treasury.clone(),
-            0u32,
-            0u32,
-        ),
+        (admin.clone(), st_xlm.clone(), treasury.clone(), 0u32, 0u32),
     );
 
     // Set vault as minter on stXLM
