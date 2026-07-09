@@ -9,7 +9,7 @@ A liquid staking protocol on Stellar Testnet. Stake XLM and receive stXLM, a yie
 ## Demo
 
 - **Live demo:** [https://stxlm.vercel.app](https://stxlm.vercel.app)
-- **Demo video:** [Watch walkthrough](https://youtu.be/YOUR_VIDEO_ID)
+- **Demo video:** [Watch walkthrough](https://www.youtube.com/watch?v=sQwNQjlO2u0)
 
 ## Architecture
 

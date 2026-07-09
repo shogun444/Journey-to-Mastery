@@ -105,6 +105,8 @@ Deployed AMM contract on Stellar testnet wrapping DEX path payments with `SwapEx
 
 ## Level 3: stXLM Liquid Staking Vault (Orange Belt)
 
+[![Demo Video](https://img.youtube.com/vi/sQwNQjlO2u0/0.jpg)](https://www.youtube.com/watch?v=sQwNQjlO2u0)
+
 A liquid staking protocol on Stellar Testnet. Stake XLM and receive stXLM, a yield-bearing receipt token. Inspired by the ERC-4626 tokenized vault standard, built with two Soroban smart contracts communicating via cross-contract calls.
 
 Built with **Next.js 16**, **TypeScript**, **Tailwind CSS v4**, **motion/react**, **@stellar/stellar-sdk**, and **soroban-sdk**.
